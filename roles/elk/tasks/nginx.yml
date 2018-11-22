@@ -1,0 +1,13 @@
+---
+- include: roles/nginx/tasks/install.yml
+
+- name: clean nginx conf directory
+  shell: "{{item}}"
+  with_items:
+      - rm -rf /etc/nginx/conf.d/*
+      - rm -rf /etc/nginx/sites-available/*
+
+- name: copy nginx conf for kibana
+  template: src=roles/elk/templates/nginx/kibana.conf dest=/etc/nginx/conf.d/kibana.conf
+ 
+- include: roles/nginx/tasks/restart.yml 

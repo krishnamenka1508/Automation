@@ -1,0 +1,59 @@
+---
+- name: "Install Erlang package"
+  apt: package="erlang-base-hipe" state="latest"
+  tags:
+  - rabbitmq
+
+- name: add apt repository
+  apt_repository:
+    repo: "deb http://www.rabbitmq.com/debian/ testing main"
+    update_cache: yes
+    state: present
+  tags:
+  - rabbitmq 
+
+- name: import repository key
+  apt_key:
+    url: https://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+    state: present
+  tags:
+  - rabbitmq  
+   
+- name: updates a server
+  apt: update_cache=yes
+  tags:
+  - rabbitmq  
+
+- name: install required packages
+  apt:
+    update_cache: yes
+    force: yes
+    pkg: "{{ item }}"
+    state: present
+  with_items:
+    - rabbitmq-server 
+  tags:
+  - rabbitmq
+
+- name: enable rabbitmq plugins
+  rabbitmq_plugin: names=rabbitmq_management,rabbitmq_federation,rabbitmq_federation_management state=enabled
+  notify:
+  - restart rabbitmq
+  tags:
+  - rabbitmq 
+
+- name: Install Rabbitmq-admin
+  shell: cd /usr/local/bin/ && wget https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_10/bin/rabbitmqadmin
+  sudo: yes
+  notify: restart rabbitmq
+  tags:
+  - rabbitmq
+    
+- name: Make executable rabbitMQ Admin
+  shell: chmod 744 /usr/local/bin/rabbitmqadmin
+  notify: restart rabbitmq
+  tags:
+  - rabbitmq
+
+  
+  

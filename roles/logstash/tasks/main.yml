@@ -1,0 +1,33 @@
+---
+# tasks file for logstash
+- include: roles/es5/tasks/apt.yml 
+
+- name: install logstash
+  apt: name=logstash state=present
+
+- include: pattern.yml
+  when: pattern
+
+- name: copy logstash conf for email/sms delivery reports
+  template: src={{ item }} dest=/etc/logstash/conf.d/{{ item | basename }} backup=yes
+  with_fileglob:
+    - roles/logstash/templates/email-api/*
+  when: emailapi_conf_setup
+  tags: rpl_logstash_conf
+  
+- name: copy logstash conf for elk
+  template: src={{ item }} dest=/etc/logstash/conf.d/{{ item | basename }} backup=yes
+  with_fileglob:
+    - roles/logstash/templates/elk/*
+  when: elk
+
+- name: logstash | configure ulimit
+  template: src=roles/logstash/templates/logstash.service dest=/etc/systemd/system/
+
+- include: roles/base/tasks/systemctl-daemon-reload.yml   
+  
+- include: restart.yml
+  tags: rpl_logstash_conf
+    
+- name: start logstash on boot
+  service: name=logstash enabled=yes

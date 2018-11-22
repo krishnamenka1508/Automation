@@ -1,0 +1,23 @@
+---
+- hosts: alls
+  gather_facts: false
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson
+  roles:
+    - servertuning  
+    - base
+    - nginx
+    - phpfpm
+    - mongodbcommon
+    - mongo
+    - redis
+    - es
+    - mysql
+    - rabbitmq
+    - filebeat
+    - logstash
+    - omd_agent
+    
+
+

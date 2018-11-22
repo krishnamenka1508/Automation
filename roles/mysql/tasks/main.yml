@@ -1,0 +1,140 @@
+---
+# tasks file for mysql
+- name: Remove mysql Package
+  shell: sudo apt-get -y remove --purge mysql* 
+  tags:
+  - mysql
+
+- name: Format the file system
+  shell: echo y | mkfs -t xfs -f {{ filesystem }} 
+  when: format_filesystem == True
+  tags:
+  - mysql
+
+- name: Create Data Folder
+  file: path={{ mounted_folder }} state=directory
+  tags:
+  - mysql
+  
+- name: Mount disk with Folder
+  shell: mount {{ filesystem }} {{ mounted_folder }}
+  when: mount_filesystem == True
+  tags:
+  - mysql
+  
+- name: Optimize ssd for sda
+  shell: echo 1024 > /sys/block/sda/queue/nr_requests && echo deadline > /sys/block/sda/queue/scheduler
+  when: mount_filesystem == True
+  tags:
+  - mysql
+  
+- name: Create variable from command
+  shell: blkid {{ filesystem }} | grep "UUID" | awk "{print \$2}"
+  register: uuid_output
+  when: mount_filesystem == True
+  tags:
+  - mysql
+  
+- name: Entry in fstab
+  lineinfile: line='{{ uuid_output.stdout }}   {{ mounted_folder }}   xfs    noatime  0   0' dest=/etc/fstab
+  when: mount_filesystem == True
+  tags:
+  - mysql
+  
+- name: ensure mysql data,log directory is created
+  file: path={{ mounted_folder }}{{ item }}  state=directory mode=0755 recurse=yes 
+  with_items:
+      - log
+      - bin-log
+  tags:
+  - mysql 
+        
+- name: Install MySQL
+  apt: name={{ item }} update_cache=yes state=present
+  with_items:
+      - python-mysqldb
+      - mysql-server
+      - python3-mysqldb      
+  sudo: yes
+  tags:
+  - mysql 
+
+- name: ensure mysql data,log directory is created
+  shell: cp -rap /var/lib/mysql {{ mounted_folder }}{{ datadir }} 
+  tags:
+  - mysql 
+    
+- name: Mysql Conf file
+  template: src=mysqld.cnf dest=/etc/mysql/mysql.conf.d/ mode=0644
+  tags:
+  - mysql 
+  
+- name: Mysql apparmor Conf file
+  template: src=usr.sbin.mysqld dest=/etc/apparmor.d/ mode=0644
+  tags:
+  - mysql  
+
+- name: Mysql apparmor Restart
+  shell: service apparmor restart
+  tags:
+  - mysql  
+    
+- name: Change Ownership of mysql config Directory
+  shell: chown -R mysql.mysql {{ mounted_folder }}{{ datadir }}
+  tags:
+  - mysql
+  
+- name: Change Ownership of mysql config Directory
+  shell: chown -R mysql.mysql {{ mounted_folder }}{{ item }}
+  with_items:
+      - log
+      - bin-log
+  tags:
+  - mysql  
+  
+- name: Configure ulimit on Mysql
+  template:
+    src: mysql.service
+    dest: /lib/systemd/system/
+  tags:
+  - mysql
+  
+- name: systemctl daemon-reload
+  shell: systemctl daemon-reload
+  ignore_errors: yes
+  tags:
+  - mysql    
+      
+- name: Start the MySQL service
+  sudo: yes
+  service: 
+    name: mysql 
+    state: restarted
+    enabled: true
+  tags:
+  - mysql 
+  
+- mysql_user:
+    name: gamysqluser
+    password: "{{  mysql_password }}"
+    priv: '*.*:ALL'
+    state: present 
+  tags:
+  - mysql  
+- mysql_user:
+    name: root
+    state: absent 
+  tags:
+  - mysql 
+- name: Start the MySQL service
+  sudo: yes
+  service: 
+    name: mysql 
+    state: restarted
+    enabled: true
+  tags:
+  - mysql
+  
+- include: backup.yml
+  tags: mysql_backup
+  

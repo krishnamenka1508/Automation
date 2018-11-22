@@ -1,0 +1,12 @@
+rs.initiate()
+sleep(13000)
+
+{% for host in groups['mongo'] %}
+rs.add("{{ private_ip }}:{{ port }}")
+sleep(8000)
+{% endfor %}
+printjson(rs.status())
+cfg = rs.conf()
+cfg.members[0].host = "{{ private_ip }}:{{ port }}"
+rs.reconfig(cfg,{force:true})
+printjson(rs.status())

@@ -1,0 +1,33 @@
+---
+# tasks file for filebeat
+- include: roles/es5/tasks/apt.yml  
+
+- name: install filebeat apt package
+  apt:
+    name: filebeat
+    state: present
+
+- name: enable filebeat on bootup and ensure it's started
+  service:
+    name: filebeat
+    enabled: yes
+
+- name: copy filebeat conf
+  template: src={{ item }} dest=/etc/filebeat/{{ item | basename }} backup=yes
+  with_fileglob:
+    - roles/filebeat/templates/{{filebeat_conf_dir}}/*
+  tags: rpl_filebeat_conf
+
+- name: configure ulimit on filebeat 
+  template:
+    src: filebeat.service
+    dest: /lib/systemd/system/
+
+- include: roles/base/tasks/systemctl-daemon-reload.yml
+
+- include: restart.yml
+  tags: rpl_filebeat_conf
+   
+
+
+

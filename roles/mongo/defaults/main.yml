@@ -1,0 +1,5 @@
+---
+# defaults file for mongos
+format_filesystem: False
+primary: False
+sharding: False

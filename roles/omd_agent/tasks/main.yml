@@ -1,0 +1,33 @@
+---
+# tasks file for omd_agent
+- name: install xinetd
+  apt: pkg=xinetd state=installed
+
+- name: install check-mk-agent
+  apt: pkg=check-mk-agent state=installed
+
+- name: setup check_mk xinetd file
+  template: src=check_mk.j2 dest=/etc/xinetd.d/check_mk owner=root group=root mode=644
+  tags: check_mk-xinetd
+# create a directory if it doesn't exist
+- file: path=/etc/check_mk state=directory
+
+- name: setup check_mk mrpe file
+  template: src={{mrpeFileName}} dest=/etc/check_mk/mrpe.cfg owner=root group=root mode=755
+  tags: extra_plugin
+  
+- name: install nagios-plugins
+  apt: pkg=nagios-plugins state=installed
+  
+- name: setup_plugin_nagios
+  action: copy src={{ item }} dest=/usr/lib/nagios/plugins/ mode="a+x" force=yes
+  with_fileglob:
+    - files/check*
+  tags: extra_plugin
+  
+- service: name=xinetd state=restarted
+  tags: extra_plugin
+  
+- name: copy nginx common file
+  template: src=nginx_common.conf dest=/etc/nginx/conf.d/api_nginx_common.conf
+  ignore_errors: yes

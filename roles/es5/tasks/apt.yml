@@ -1,0 +1,19 @@
+---
+# save repo definition (for all elasticsearch software).
+- name: install java
+  apt: name=default-jre state=present update_cache=yes
+
+- name: Add elastic apt repo key (for all elastic software)
+  apt_key:
+    url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+    state: present
+
+- name: install apt-transports-https    
+  apt: name=apt-transport-https state=present
+
+- name: save repo (for all elastic software)
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/5.x/apt stable main"
+    update_cache: yes
+    state: present
+  

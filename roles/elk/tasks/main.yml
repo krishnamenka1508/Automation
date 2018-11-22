@@ -1,0 +1,17 @@
+---
+# tasks file for elk
+
+- include: es.yml
+
+- include: es-mapping.yml
+
+- include: kibana.yml
+
+- include: nginx.yml 
+
+- include: htpasswd.yml
+
+- include: snapshot.yml
+  tags: elk_snapshot
+
+

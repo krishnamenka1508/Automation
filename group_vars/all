@@ -1,0 +1,12 @@
+---
+ansible_ssh_user: root
+#ansible_ssh_private_key_file: /home/krishna/kk
+ansible_become: true
+ansible_python_interpreter: /usr/bin/python3
+#ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q kk@bastion.betaout.org"'
+lvm: true
+firewall: true
+netmask: 255.255.255.0
+private_subnet_block: 172.16.16.0/24
+office_ip: 119.82.76.222
+openvpn_ip: 159.203.178.105

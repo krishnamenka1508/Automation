@@ -1,0 +1,7 @@
+---
+- name: logstash pattern directory
+  file: path=/opt/logstash/patterns/ state=directory owner=logstash group=logstash mode=0755 recurse=yes  
+
+- name: copy pattern
+  template: src=roles/logstash/templates/nginx dest=/opt/logstash/patterns/ owner=logstash group=logstash
+

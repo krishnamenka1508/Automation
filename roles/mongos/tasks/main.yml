@@ -1,0 +1,204 @@
+---
+# tasks file for mongos
+- name: Format the file system
+  shell: echo y | mkfs -t xfs -f {{ filesystem }} 
+  when: format_filesystem == True
+  ignore_errors: yes
+  tags:    
+  - mongoconfig 
+  - mongosharding
+  - mongo
+
+- name: Create Data Folder
+  file: path={{ mounted_folder }} state=directory
+  tags:    
+  - mongoconfig 
+  - mongosharding
+  - mongo
+  
+- name: Mount disk with Folder
+  shell: mount {{ filesystem }} {{ mounted_folder }}
+  when: mount_filesystem == True
+  ignore_errors: yes
+  tags:    
+  - mongoconfig 
+  - mongosharding
+  - mongo
+  
+- name: Create variable from command
+  shell: blkid {{ filesystem }} | grep "UUID" | awk "{print \$2}"
+  register: uuid_output
+  when: mount_filesystem == True
+  ignore_errors: yes
+  tags:
+  - mongoconfig 
+  - mongosharding
+  - mongo
+  
+- name: Entry in fstab
+  lineinfile: line='{{ uuid_output.stdout }}   {{ mounted_folder }}   xfs    noatime  0   0' dest=/etc/fstab
+  when: mount_filesystem == True
+  ignore_errors: yes
+  tags:
+  - mongoconfig 
+  - mongosharding
+  - mongo
+  
+- name: ensure mongo log directory is created
+  file: path={{ mounted_folder }}log  state=directory   owner=mongodb group=mongodb  mode=0755 recurse=yes
+  tags:
+  - mongoconfig
+  - mongo
+  
+  
+- name: ensure mongo sharding directory is created
+  shell: mkdir -p {{ mounted_folder }}{{ data_path }}  && chown -R mongodb:mongodb {{ mounted_folder }}{{ data_path }} 
+  tags:
+  - mongosharding
+  - mongo
+  
+            
+- name: Create mongo service file
+  template: src={{ service_name }} dest=/lib/systemd/system/mongod.service mode=0644
+  tags:
+  - bg
+  - api
+  - front
+  - mongo
+  - mongoconfig
+  - mongosharding
+    
+- name: Create the mongo config configuration file
+  template: src={{ conf }} dest=/etc/mongod.conf
+  tags:
+  - bg
+  - api
+  - front
+  - mongo
+  - mongoconfig
+  - mongosharding
+  
+   
+- name: allow mongodb user to acess /var/lib/mongodb
+  shell: mkdir -p /var/lib/mongodb  && chown -R mongodb:mongodb /var/lib/mongodb
+  ignore_errors: yes
+  tags:
+  - mongo
+  - bg
+  - api
+  - front
+
+  
+- name: systemctl daemon-reload
+  shell: systemctl daemon-reload
+  ignore_errors: yes
+  tags:
+  - bg
+  - api
+  - front
+  - mongo
+  - mongosharding
+  - mongoconfig
+
+  
+- name:  Restart mongod service 
+  shell: service {{ service }} restart
+  ignore_errors: yes
+  tags:
+  - bg
+  - api
+  - front
+  - mongo
+  - mongoconfig
+  - mongosharding
+  
+  
+- name: Enable mongod on bootup and ensure it's started
+  service:
+    name: mongod
+    enabled: yes
+  tags:
+  - bg
+  - api
+  - front
+  - mongo
+  - mongosharding
+  - mongoconfig  
+
+
+- name: Create the file to initialize the mongod replica set
+  template: src=replset_init.j2 dest=/tmp/replset_init.js
+  when: mongoconfig == True
+  tags:
+  - mongo
+  - mongof
+
+
+- name: Pause for a while
+  pause: seconds=20
+  when: mongoconfig == True
+  tags:
+  - mongo
+  - mongof
+
+- name: Initialize the replication set
+  shell: /usr/bin/mongo --port "{{ port }}" /tmp/replset_init.js
+  when: mongoconfig == True
+  tags:
+  - mongo
+  - mongof
+  
+  
+  
+  
+- name: Create the file to initialize the mongod replica set
+  template: src=repset_shard_init.j2 dest=/tmp/repset_shard_init.js
+  when: mongoshard == True
+  tags:
+  - mongo
+  - mongof
+
+- name: Pause for a while
+  pause: seconds=20
+  when: mongoshard == True
+  tags:
+  - mongo
+  - mongof
+
+- name: Initialize the replication set
+  shell: /usr/bin/mongo --port "{{ port }}" /tmp/repset_shard_init.js
+  when: mongoshard == True
+  tags:
+  - mongo
+  - mongof  
+      
+    
+  
+- name: Create the file to add shard set
+  template: src=shard_init.j2 dest=/tmp/shard_init.j2
+  when: mongos == True
+  tags:
+  - mongo
+  - mongof
+  - kk
+
+- name: Pause for a while
+  pause: seconds=20
+  when: mongos == True
+  tags:
+  - mongo
+  - mongof
+  - kk
+
+- name: Add new shard
+  shell: /usr/bin/mongo  /tmp/shard_init.j2
+  when: mongos == True
+  tags:
+  - mongo
+  - mongof
+  - kk
+
+  
+    
+
+

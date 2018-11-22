@@ -1,0 +1,21 @@
+---
+# tasks file for mongodbcommon
+- name: remove mongodb
+  shell: apt-get -y remove mongodb-org*
+  ignore_errors: yes
+  
+- name: adding public signing key mongodb
+  apt_key:
+    id: "{{ mongodb_apt_key_id }}"
+    keyserver: "{{ mongodb_apt_key_server }}"
+  
+- name: update apt for mongodb
+  apt_repository:
+    repo: "{{ mongodb_apt_repository }}"
+    update_cache: yes
+  
+- name: install mongodb
+  apt:
+    pkg: "{{ mongodb_package }}"
+    state: present
+  

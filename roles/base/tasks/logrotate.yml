@@ -1,0 +1,29 @@
+---
+- name: ensure consume file is created
+  file: path=/etc/logrotate.d/consume owner=root group=root mode=0644 state=touch
+  
+- name: logrotate | consume
+  copy:
+    src: roles/base/files/logrotate/consume
+    dest: /etc/logrotate.d/consume
+    owner: root
+    group: root
+    
+- name: enable logrotate
+  shell: logrotate /etc/logrotate.d/consume
+  ignore_errors: yes 
+
+
+- name: ensure errorlogbeat file is created
+  file: path=/etc/logrotate.d/logbeat owner=root group=root mode=0644 state=touch
+  
+- name: logrotate | errorlogbeat
+  copy:
+    src: roles/base/files/logrotate/logbeat
+    dest: /etc/logrotate.d/logbeat
+    owner: root
+    group: root
+    
+- name: enable errorlogbeat logrotate
+  shell: logrotate /etc/logrotate.d/logbeat
+  ignore_errors: yes   

@@ -1,0 +1,36 @@
+---
+- name: register snapshot on s3
+  shell: curl -XPUT 'http://localhost:9200/_snapshot/broccoli' -d '{"type":"s3","settings":{"bucket":"elk-snaps","region":"ca-central-1","compress":true,"base_path":"snapshots","storage_class":"standard_ia"}}'
+  ignore_errors: yes
+  
+- name: install jq
+  apt: name=jq state=present
+  ignore_errors: yes
+
+- name: create script directory
+  file: path=/script state=directory
+ 
+- name: copy scripts
+  action: copy src={{ item }} dest=/script/ force=yes
+  with_fileglob:
+    - roles/elk/templates/script/*
+
+- name: set cron for create snapshot
+  cron:
+    name: "create snapshot"
+    hour: "2"
+    minute: "10"
+    job: "sh /script/create-snapshot.sh >> /var/log/create-snapshot.log 2>&1"
+    
+- name: set cron for delete index
+  cron:
+    name: "delete index"
+    minute: "*/10"
+    job: "sh /script/delete-index.sh >> /var/log/delete-index.log 2>&1"
+    
+- name: set cron for delete snapshot
+  cron:
+    name: "delete snapshot"
+    hour: "5"
+    minute: "10"
+    job: "sh /script/del-snapshot.sh >> /var/log/del-snapshot.log 2>&1"

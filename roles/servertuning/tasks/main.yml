@@ -1,0 +1,117 @@
+---
+# tasks file for servertuning 
+# Force Locale
+- name: force locale
+  lineinfile: line='LC_ALL=en_US.UTF-8' dest=/etc/default/locale
+
+- name: locale gen all
+  locale_gen: name={{ item }} state=present
+  with_items:
+      - en_US.UTF-8
+      - en_US
+      - en_IN
+      - fr_FR
+      - de_DE
+      - de_CH
+      - be_BY
+
+- name: tune sysctl
+  template:
+    src: "sysctl.conf"
+    dest: "/etc/sysctl.conf"
+    backup: yes
+  tags: rpl_sysctl
+
+- name: refresh sysctl      
+  shell: sysctl -p
+  ignore_errors: yes
+  tags: rpl_sysctl
+  
+- name : install apt
+  apt: name=aptitude
+
+- name: remove localtime
+  file: path=/etc/localtime state=absent
+  register: localtime
+
+- name: set timezone to GMT
+  command: ln -sf /usr/share/zoneinfo/GMT /etc/localtime
+  when: localtime|success
+
+- name: update package list of server
+  apt: update_cache=yes
+  ignore_errors: yes
+
+- name: install monitoring tools
+  shell: apt -y install numactl sysstat htop glances iotop iftop xfsprogs ufw iperf traceroute mlocate telnet links
+  ignore_errors: yes
+  
+- name: history env variables
+  blockinfile:
+    path: /etc/bash.bashrc
+    marker: "# {mark} History env variables"
+    block: |
+        export HISTFILESIZE=30000
+        export HISTSIZE=30000
+        export HISTTIMEFORMAT="[%F %T] "
+
+- name: install ntp server
+  apt: name=ntp state=present
+  
+- name: install curl server
+  apt: name=curl state=present
+  
+- name: install awscli
+  apt: name=awscli update_cache=yes state=latest
+  ignore_errors: yes
+  
+- name: get scsi devices      
+  shell: lsblk -S -o NAME | grep -v NAME
+  register: disk
+  ignore_errors: yes
+      
+- name: maximize ssd throughput
+  shell: echo 1024 > /sys/block/{{item}}/queue/nr_requests && echo deadline > /sys/block/{{item}}/queue/scheduler
+  with_items: "{{disk.stdout_lines}}"
+  ignore_errors: yes
+  
+- name: set hostname
+  shell: hostnamectl set-hostname {{ hostname }}
+  ignore_errors: yes
+  when: hostname is defined
+
+- name: disable SSH PasswordAuthentication
+  shell: "{{item}}"
+  with_items:
+      - awk '!/PasswordAuthentication/' /etc/ssh/sshd_config > temp && mv temp /etc/ssh/sshd_config
+      - echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+      - service ssh restart
+  
+- include: staticip.yml
+  when: private_ip is defined
+
+- name: Read device information
+  parted: device=/dev/sdb unit=MiB
+  register: sdb_info
+  ignore_errors: yes
+    
+- name: delete secondary partitions
+  parted:
+    device: /dev/sdb
+    number: "{{ item.num }}"
+    state: absent
+  with_items:
+   - "{{ sdb_info.partitions }}"
+  ignore_errors: yes
+
+- name: LVM | Extend
+  shell: vgremove vg_old /dev/sdb; vgextend -y vg /dev/sdb; lvresize -l +100%FREE --resizefs vg/lv1
+  ignore_errors: yes
+  when: lvm
+  
+- include: firewall.yml
+  when: firewall 
+  
+- include: ssh.yml
+  when: install_dev_key
+  

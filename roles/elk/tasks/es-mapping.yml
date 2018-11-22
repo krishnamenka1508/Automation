@@ -1,0 +1,9 @@
+---
+- name: copy es template file
+  template: 
+    src: "roles/elk/templates/filebeat-template.json"
+    dest: "~"
+
+- name:  load filebeat mapping to es
+  shell: curl -XPUT 'http://localhost:9200/_template/filebeat?pretty' -d@filebeat-template.json
+  ignore_errors: yes

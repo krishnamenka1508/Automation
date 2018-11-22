@@ -1,0 +1,27 @@
+[Unit]
+Description=Elasticsearch
+Documentation=http://www.elastic.co
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Environment=ES_HOME=/usr/share/elasticsearch
+Environment=CONF_DIR=/etc/{{ service }}
+Environment=DATA_DIR={{ mounted_folder }}{{ data_path }}data
+Environment=LOG_DIR={{ mounted_folder }}{{ data_path }}logs
+Environment=PID_DIR={{ mounted_folder }}{{ data_path }}
+EnvironmentFile=-/etc/default/elasticsearch
+
+WorkingDirectory=/usr/share/elasticsearch
+
+User=elasticsearch
+Group=elasticsearch
+
+ExecStartPre=/usr/share/elasticsearch/bin/elasticsearch-systemd-pre-exec
+
+ExecStart=/usr/share/elasticsearch/bin/elasticsearch \
+                                                -Des.pidfile=${PID_DIR}/elasticsearch.pid \
+                                                -Des.default.path.home=${ES_HOME} \
+                                                -Des.default.path.logs=${LOG_DIR} \
+                                                -Des.default.path.data=${DATA_DIR} \
+                                                -Des.default.path.conf=${CONF_DIR}

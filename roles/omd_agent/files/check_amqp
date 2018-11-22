@@ -1,0 +1,100 @@
+#!/bin/bash
+# ========================================================================================
+# Check number of connections of RabbitMQ for Nagios 
+#
+# Written by	: Ravi Kuppanna
+# Release	: 1
+# Creation date : 20 May 2016
+# Package       : 
+# Description   : Nagios plugin (script) to check RabbitMQ number of AMQP connections
+#		This script has been designed and written on Unix plateform (Linux, Aix, Solaris).
+#
+# Usage         : ./check_amqp.sh -H <RabbitMQ-Server> -P <Port> -u <User> -p <password>
+# ----------------------------------------------------------------------------------------
+# ========================================================================================
+#
+# HISTORY :
+#     Release	|     Date	|    Authors	| 	Description
+# --------------+---------------+---------------+------------------------------------------
+#	1.0	|    20.05.16	| Ravi Kuppanna | Created Script for counting number of AMQP connections
+# =========================================================================================
+
+# Paths to commands used in this script.  These may have to be modified to match your system setup.
+
+#sudo rabbitmqadmin -H localhost -P 15672 -u gauser -p get@#amplify249 -f tsv -q list connections | wc -l
+SUDO=/usr/bin/sudo
+RMQ=/usr/local/bin/rabbitmqadmin
+RM=/bin/rm
+PID=`echo $$`
+
+# Nagios return codes
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
+#
+# Plugin parameters value if not define
+#
+# Plugin variable description
+PROGNAME=$(basename $0)
+RELEASE="Revision 1.0"
+AUTHOR="JustOpex based on inputs frmo Saurabh @ Betaout"
+
+if [ ! -x $SUDO ]; then
+	echo "UNKNOWN: sudo not found or is not executable by the nagios user."
+	exit $STATE_UNKNOWN
+fi
+
+# Functions plugin usage
+print_release() {
+    echo "$RELEASE $AUTHOR"
+}
+
+print_usage() {
+	echo ""
+	echo "$PROGNAME $RELEASE - Print number of AMQP connections script for Nagios"
+	echo ""
+	echo "Usage: check_amqp [-h]"
+	echo ""
+	echo "Flags: None"
+	echo "  -h  Show this page"
+	echo ""
+    echo "Usage: $PROGNAME"
+    echo "Usage: $PROGNAME --help"
+    echo ""
+}
+
+print_help() {
+	print_usage
+        echo ""
+        echo "This plugin will print number of AMQP connections"
+        echo ""
+	exit 0
+}
+
+# 
+SERVER=localhost
+PORT=15672
+DUDE=gauser
+PASSWD="get@#amplify249"
+
+case `uname` in
+  	Linux ) $SUDO $RMQ -H $SERVER -P $PORT -u $DUDE -p $PASSWD -f tsv -q list connections > /var/tmp/amqp.$PID 2>/dev/null
+		if [ $? -eq 0 ]; then
+  		  NUM_AMQP_CON=$(cat /var/tmp/amqp.$PID | wc -l)
+		else
+		  echo "RabitMQ Down"
+		  exit $STATE_UNKNOWN
+		fi
+                $SUDO $RM -f /var/tmp/amqp.$PID
+            ;;
+	*) 		echo "UNKNOWN: `uname` not yet supported by this plugin. Coming soon !"
+			exit $STATE_UNKNOWN 
+	    ;;
+	esac
+
+# Return
+
+# If we got this far, everything seems to be OK 
+echo "AMQP OK (Count=$NUM_AMQP_CON) | Num_Connections=$NUM_AMQP_CON"
+exit $STATE_OK

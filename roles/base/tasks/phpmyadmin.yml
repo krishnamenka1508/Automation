@@ -1,0 +1,12 @@
+---
+- name: ensure phpMyAdmin is installed.
+  apt: name=phpmyadmin state=installed
+  when: phpmyadmin_setup == True
+  tags:
+  - front
+  
+- name: change config-db file
+  template: src=mysql1.php dest=/etc/phpmyadmin/conf.d/ owner=root mode=0644
+  when: phpmyadmin_setup == True
+  tags:
+  - front

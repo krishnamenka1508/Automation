@@ -1,0 +1,22 @@
+---
+# tasks file for omd
+- name: Download Omd
+  get_url: url=http://files.omdistro.org/releases/debian_ubuntu/omd-1.20.trusty.amd64.deb dest=/tmp
+
+- name: install omd
+  command: chdir=/tmp  dpkg -i omd-1.20.trusty.amd64.deb
+
+- name: install some missing package
+  command: apt-get -y -f install
+
+- name: create omd site
+  command: omd create {{ omd_site }} creates=/opt/omd/sites/{{ omd_site }}
+
+- name: start omdistro site
+  command: omd start {{ omd_site }} 
+
+- name: check status of omd site
+  command: omd status
+- name: install postfix
+  command: sudo apt-get -y install postfix mailutils
+  tags: postfix

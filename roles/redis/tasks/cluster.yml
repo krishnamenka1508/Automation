@@ -1,0 +1,31 @@
+---
+# tasks file for redis
+- name: Installing Ruby package
+  apt:
+    pkg: ruby
+    state: present
+  tags:
+  - redisc
+  - redis
+  
+- name: gem install redis
+  shell: gem install redis
+  ignore_errors: yes
+  tags:
+  - redisc
+  - redis
+  
+- name: download and execute redis-trib.rb
+  get_url:
+    url: http://download.redis.io/redis-stable/src/redis-trib.rb
+    dest: /tmp/redis-trib.rb
+    mode: "a+x"
+  ignore_errors: yes
+  tags:
+  - redisc
+  - redis
+  
+- shell: echo 'yes' | /tmp/redis-trib.rb create --replicas 1  {{ redis_trib_ips }} chdir=/tmp/
+  tags:
+  - redisc
+  - redis

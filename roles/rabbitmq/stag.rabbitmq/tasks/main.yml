@@ -1,0 +1,78 @@
+---
+# tasks file for rabbitmq
+- name: Remove Rabbitmq package 
+  shell: sudo apt-get -y purge rabbitmq-server
+  tags:
+  - rabbitmq
+
+- name: Format the file system
+  shell: echo y | mkfs -t xfs {{ filesystem }} 
+  when: format_filesystem == True
+  tags:
+  - rabbitmq
+
+- name: Create Data Folder
+  file: path={{ mounted_folder }} state=directory
+  tags:
+  - rabbitmq
+  
+- name: Mount disk with Folder
+  shell: mount {{ filesystem }} {{ mounted_folder }}
+  when: mount_filesystem == True
+  tags:
+  - rabbitmq
+  
+- include: setup.yml    
+
+- name: ensure rabbitmq mnesia & logs directory is created
+  file: path={{ mounted_folder }}{{ data_path }}logs state=directory  mode=0755 recurse=yes   
+  tags:
+  - rabbitmq
+
+- name: ensure rabbitmq config directory is created
+  file: path=/etc/{{ data_path }}  state=directory  mode=0755 recurse=yes  
+  tags:
+  - rabbitmq  
+  
+- name: Create the rabbitmq configuration file
+  template: src={{ rq_conf }} dest=/etc/{{ data_path }}/{{ rq_conf }}
+  tags:
+  - rabbitmq  
+
+#- name: Create rq service file
+#  template: src={{ service_name }} dest=/lib/systemd/system/{{ service_name }} mode=0644
+#  tags:
+#  - rabbitmq  
+            
+- name: Change Ownership of rq Directory
+  shell: cd {{ mounted_folder }} && chown -R rabbitmq.rabbitmq {{ data_path }} 
+  tags:
+  - rabbitmq
+
+- name: Change Ownership of rq config Directory
+  shell: chown -R rabbitmq.rabbitmq {{ data_path }}{{ rq_conf }} 
+  args:
+    chdir: /etc/
+  tags:
+  - rabbitmq  
+  
+- include: vhosts.yml 
+
+- name: service rabbitmq restart 
+  shell: service {{ service_name }} restart
+  ignore_errors: yes
+  tags:
+  - rabbitmq 
+
+- name: Service Autostart on reboot
+  shell: systemctl enable rabbitmq-server
+  tags:
+  - rabbitmq
+  
+  
+
+  
+
+  
+  
+  

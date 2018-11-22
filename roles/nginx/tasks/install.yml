@@ -1,0 +1,43 @@
+---
+# tasks file for nginx
+- name: Remove Nginx package 
+  apt: name="nginx"  update_cache=yes  state=absent force=yes
+
+- name: install add-apt-repository binary for Ansible to work
+  apt: name=python-software-properties state=present update_cache=yes
+
+- name: run the equivalent of "apt-get update" as a separate step
+  apt: update_cache=yes
+
+- name: install Nginx with default version
+  apt: name="nginx"  update_cache=yes  state=present force=yes
+
+- name: start nginx on boot
+  service: name=nginx enabled=yes
+  
+- name: copy nginx.conf
+  template: src={{playbook_dir}}/roles/nginx/templates/nginx.conf dest=/etc/nginx/nginx.conf
+  
+- name: configure ulimit on nginx 
+  template:
+    src: roles/nginx/templates/nginx.service
+    dest: /lib/systemd/system/
+  
+- include: roles/base/tasks/systemctl-daemon-reload.yml
+
+- include: roles/nginx/tasks/restart.yml
+
+- name: logrotate | nginx
+  copy:
+    src: roles/nginx/files/logrotate/nginx
+    dest: /etc/logrotate.d/nginx
+    owner: root
+    group: root
+
+- name: set cron | logrotate 
+  cron:
+    name: "logrotate"
+    minute: "*/15"
+    job: "/etc/cron.daily/logrotate"
+
+

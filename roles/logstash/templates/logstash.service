@@ -1,0 +1,34 @@
+[Unit]
+Description=logstash
+
+[Service]
+Type=simple
+User=logstash
+Group=adm
+# Load env vars from /etc/default/ and /etc/sysconfig/ if they exist.
+# Prefixing the path with '-' makes it try to load, but if the file doesn't
+# exist, it continues onward.
+EnvironmentFile=-/etc/default/logstash
+EnvironmentFile=-/etc/sysconfig/logstash
+ExecStart=/usr/share/logstash/bin/logstash "--path.settings" "/etc/logstash"
+Restart=always
+WorkingDirectory=/
+Nice=19
+LimitNOFILE=16384
+
+# max lock memory
+LimitMEMLOCK=infinity
+# file size
+LimitFSIZE=infinity
+# cpu time
+LimitCPU=infinity
+# virtual memory size
+LimitAS=infinity
+# open files
+LimitNOFILE=64000
+# processes/threads
+LimitNPROC=64000
+
+
+[Install]
+WantedBy=multi-user.target

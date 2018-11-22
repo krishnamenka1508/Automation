@@ -1,0 +1,5 @@
+---
+# defaults file for redis
+redis_package: redis-server
+# APT repository
+redis_apt_repository: "ppa:chris-lea/redis-server"

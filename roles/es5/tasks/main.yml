@@ -1,0 +1,127 @@
+---
+# tasks file for es5
+- name: Ulimit
+  shell: ulimit -l unlimited
+  tags:
+  - es5
+
+- name: Format the file system
+  shell: echo y | mkfs -t xfs -f {{ filesystem }} 
+  when: format_filesystem == True
+  tags:
+  - es5
+
+- name: Create Data Folder
+  file: path={{ mounted_folder }} state=directory
+  when: format_filesystem == True
+  tags:
+  - es5
+  
+- name: Mount disk with Folder
+  shell: mount {{ filesystem }} {{ mounted_folder }}
+  when: mount_filesystem == True
+  tags:
+  - es5
+  
+- name: Create variable from command
+  shell: blkid {{ filesystem }} | grep "UUID" | awk "{print \$2}"
+  register: uuid_output
+  when: mount_filesystem == True
+  tags:
+  - es5
+  
+- name: Entry in fstab
+  lineinfile: line='{{ uuid_output.stdout }}   {{ mounted_folder }}   xfs    noatime  0   0' dest=/etc/fstab
+  when: mount_filesystem == True
+  tags:
+  - es5
+
+- name: Create es data,logs folder
+  file: path={{ item }}  state=directory mode=0755 recurse=yes
+  sudo: yes
+  with_items:
+    - "{{ mounted_folder }}esdata"
+    - "{{ mounted_folder }}logs"
+  tags:
+  - es5
+
+- name: Remove Elasticsearch package 
+  shell: sudo apt-get -y --purge autoremove elasticsearch
+  ignore_errors: yes
+  tags:
+  - es5
+
+- include: roles/es5/tasks/apt.yml
+
+- name: Installing Elasticsearch package 
+  apt:
+    pkg: "elasticsearch"
+    state: present
+  tags:
+  - es5 
+
+- name: Enable es on bootup and ensure it's started
+  shell: systemctl enable elasticsearch
+  tags:
+  - es5
+
+- name: Create the elasticsearch configuration file
+  template: src={{ es_conf }} dest=/etc/elasticsearch/{{ es_conf }}
+  tags:
+  - es5
+
+- name: Create the default configuration file
+  template: src=default-elasticsearch dest=/etc/default/elasticsearch
+  tags:
+  - es5
+
+- name: Set jvm options 
+  template: src=jvm.options dest=/etc/elasticsearch/jvm.options
+  tags:
+  - es5
+
+- name: Create es service file
+  template: src={{ service_name }} dest=/usr/lib/systemd/system/{{ service_name }} mode=0644
+  tags:
+  - es5
+
+- name: Change Ownership of es Directory
+  shell: chown -R elasticsearch.elasticsearch {{ mounted_folder }}
+  tags:
+  - es5
+
+- name: Es plugins
+  shell: /usr/share/elasticsearch/bin/elasticsearch-plugin install {{ item }}
+  with_items:
+    - repository-s3
+    - mapper-size
+  ignore_errors: yes
+  tags:
+  - es5
+
+- name: Es keystore
+  shell: "{{ item }}"
+  with_items:
+    - /usr/share/elasticsearch/bin/elasticsearch-keystore create
+    - echo "AKIAJWKUT2PEQ66QTUYA" | /usr/share/elasticsearch/bin/elasticsearch-keystore add --stdin s3.client.default.access_key
+    - echo "fIp6Mn1iBMbeyxaorTdFis23OjPd4rQK9z+W/kYt" | /usr/share/elasticsearch/bin/elasticsearch-keystore add --stdin s3.client.default.secret_key
+  ignore_errors: yes
+  tags:
+  - es5
+
+- name: Change Ownership of es Directory
+  shell: chown -R elasticsearch.elasticsearch /etc/elasticsearch/elasticsearch.keystore
+  tags:
+  - es5
+
+- name: systemctl daemon-reload
+  shell: systemctl daemon-reload
+  ignore_errors: yes
+  tags:
+  - es5
+
+#- name: service elasticsearch restart 
+#  shell: service elasticsearch restart
+#  ignore_errors: yes
+#  tags:
+#  - es5

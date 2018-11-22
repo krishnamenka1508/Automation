@@ -1,0 +1,9 @@
+---
+- name: install dev key
+  authorized_key:
+    user: root
+    state: present
+    key: '{{ item }}'
+  with_file:
+    - roles/servertuning/templates/public_keys/dev.pub
+  tags: install_dev_key

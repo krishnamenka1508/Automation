@@ -1,0 +1,13 @@
+---
+# ansible-playbook elk.yml --vault-password-file=~/.vault_pass
+
+- hosts: elk*
+  gather_facts: True
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson
+  roles:
+    - servertuning  
+    - elk
+    - logstash
+    - omd_agent

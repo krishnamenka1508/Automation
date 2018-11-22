@@ -1,0 +1,25 @@
+---
+# tasks file for phpfpm
+- name: install php7.0-fpm
+  apt: pkg=php7.0-fpm state=installed force=yes
+
+# Install the default templates
+- name: copy fpm.conf
+  template:
+    src=php-fpm.conf
+    dest=/etc/init/php7.0-fpm.conf
+
+# Add FPM Pools
+- name: "copy pool.d/www.conf"
+  template:
+    src=www.conf
+    dest=/etc/php/7.0/fpm/pool.d/www.conf
+
+# Ulimit Configuration
+- name: php7.0-fpm ulimit
+  template:
+    src=php7.0-fpm.service
+    dest=/lib/systemd/system/    
+    
+- include: roles/base/tasks/systemctl-daemon-reload.yml      
+- include: restart.yml

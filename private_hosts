@@ -1,0 +1,145 @@
+[redis]
+redis-a1.betaout.org  ansible_host=172.16.16.30 
+redis-a2.betaout.org  ansible_host=172.16.16.31 
+redis-b1.betaout.org  ansible_host=172.16.16.32 
+redis-b2.betaout.org  ansible_host=172.16.16.33 
+redis-c1.betaout.org  ansible_host=172.16.16.34 
+redis-c2.betaout.org  ansible_host=172.16.16.35 
+
+[es]
+es2-logger-master	ansible_host=172.16.16.117	
+es2-logger-node1	ansible_host=172.16.16.118	
+es2-logger-node2	ansible_host=172.16.16.119	
+	
+es2-default-master	ansible_host=172.16.16.120	
+es2-default-node1	ansible_host=172.16.16.121	
+es2-default-node2	ansible_host=172.16.16.122	
+es2-default-node3	ansible_host=172.16.16.123	
+es2-default-node4	ansible_host=172.16.16.124	
+es2-default-node5	ansible_host=172.16.16.125	
+es2-default-node6       ansible_host=172.16.16.159
+es2-default-node7	ansible_host=172.16.16.157
+es2-default-node8	ansible_host=172.16.16.176
+es2-default-node10	ansible_host=172.16.16.177
+es2-default-node11	ansible_host=172.16.16.178	 
+
+es2-lenskart-master	ansible_host=172.16.16.126	
+es2-lenskart-node1	ansible_host=172.16.16.127	
+es2-lenskart-node2	ansible_host=172.16.16.128	
+es2-lenskart-node3	ansible_host=172.16.16.129	
+es2-lenskart-node4	ansible_host=172.16.16.130	
+es2-lenskart-node5	ansible_host=172.16.16.131	
+es2-lenskart-node6	ansible_host=172.16.16.132	
+		
+es2-ent-med-master	ansible_host=172.16.16.133	
+es2-ent-med-node1	ansible_host=172.16.16.134	
+es2-ent-med-node2	ansible_host=172.16.16.135	
+es2-ent-med-node3	ansible_host=172.16.16.136	
+		
+es2-paytm-master	ansible_host=172.16.16.137	
+es2-paytm-node1	        ansible_host=172.16.16.138	
+es2-paytm-node2	        ansible_host=172.16.16.139	
+es2-paytm-node3	        ansible_host=172.16.16.140	
+es2-paytm-node4	        ansible_host=172.16.16.141	
+es2-paytm-node5	        ansible_host=172.16.16.142	
+es2-paytm-node6	        ansible_host=172.16.16.143	
+es2-paytm-node7	        ansible_host=172.16.16.144	
+es2-paytm-node8	        ansible_host=172.16.16.145	
+		
+es2-tokopedia-master	ansible_host=172.16.16.146	
+es2-tokopedia-node1	ansible_host=172.16.16.147	
+es2-tokopedia-node2	ansible_host=172.16.16.148	
+es2-tokopedia-node3	ansible_host=172.16.16.149	
+es2-tokopedia-node4	ansible_host=172.16.16.150	
+es2-tokopedia-node5	ansible_host=172.16.16.151
+es2-tokopedia-node6	ansible_host=172.16.16.158	
+		
+es5-default-master	ansible_host=172.16.16.152
+es5-default-node1       ansible_host=172.16.16.153
+es5-default-node2	ansible_host=172.16.16.154	
+es5-default-node3	ansible_host=172.16.16.155
+es5-default-node4       ansible_host=172.16.16.156
+es5-default-node5       ansible_host=172.16.16.160
+es5-default-node6	ansible_host=172.16.16.161
+
+es5-tokopedia-master	ansible_host=172.16.16.156	
+				
+
+[rabbitmq]
+rmqs-ups1.betaout.org       ansible_host=172.16.16.91	
+rmqs-ups2.betaout.org       ansible_host=172.16.16.92	
+rmqs-downs1.betaout.org     ansible_host=172.16.16.93	
+rmqs-downs2.betaout.org     ansible_host=172.16.16.94	
+rmqs-sensitive1.betaout.org ansible_host=172.16.16.95	
+rmqs-nfes.betaout.org       ansible_host=172.16.16.96	
+rmqs-nflog.betaout.org      ansible_host=172.16.16.97
+rmqs-rollup.betaout.org     ansible_host=172.16.16.98	
+
+[mysql]
+mysql-master.betaout.org  ansible_host=172.16.16.107	
+
+[mongo]
+mn-cfg1.betaout.org     ansible_host=172.16.16.5	
+mn-cfg2.betaout.org     ansible_host=172.16.16.6	
+mn-cfg3.betaout.org     ansible_host=172.16.16.7	
+
+mn-sh-a1.betaout.org    ansible_host=172.16.16.8	
+mn-sh-a2.betaout.org    ansible_host=172.16.16.9	
+mn-sh-a3.betaout.org    ansible_host=172.16.16.10	
+mn-sh-b1.betaout.org    ansible_host=172.16.16.11	
+mn-sh-b2.betaout.org    ansible_host=172.16.16.12	
+mn-sh-b3.betaout.org    ansible_host=172.16.16.13	
+mn-sh-c1.betaout.org    ansible_host=172.16.16.14	
+mn-sh-c2.betaout.org    ansible_host=172.16.16.15	
+mn-sh-c3.betaout.org    ansible_host=172.16.16.16	
+
+mn-baikal.betaout.org   ansible_host=172.16.16.21	
+
+
+[api]
+api-1.betaout.org       ansible_host=172.16.16.45	
+api-2.betaout.org       ansible_host=172.16.16.46	
+ 
+em-api-1.betaout.org    ansible_host=172.16.16.47	
+em-api-2.betaout.org    ansible_host=172.16.16.48	
+
+m-api-1.betaout.org     ansible_host=172.16.16.49	
+bulk-api-1.betaout.org  ansible_host=172.16.16.50	
+misc-api.betaout.org    ansible_host=172.16.16.51	
+
+[front]
+front.betaout.org  ansible_host=172.16.16.81	
+
+[bg]
+bg-1.betaout.org       ansible_host=172.16.16.65	
+bg-2.betaout.org       ansible_host=172.16.16.66	
+bg-3.betaout.org       ansible_host=172.16.16.67	
+bg-4.betaout.org       ansible_host=172.16.16.68	
+bg-5.betaout.org       ansible_host=172.16.16.69	
+bg-6.betaout.org       ansible_host=172.16.16.70	
+bg-7.betaout.org       ansible_host=172.16.16.71	
+bg-em1.betaout.org	ansible_host=172.16.16.72	
+bg-em2.betaout.org	ansible_host=172.16.16.73
+worker-es-move.betaout.org ansible_host=172.16.16.74
+ 
+[nagios]
+nagios.betaout.org    ansible_host=172.16.16.169
+
+[elk]
+elk.betaout.org       ansible_host=172.16.16.172
+
+[bastion]
+bastion.betaout.org   ansible_host=172.16.16.171
+
+[devprod]
+devprod.betaout.org   ansible_host=172.16.16.170
+
+[preprod]
+preprod.betaout.org   ansible_host=172.16.16.173
+
+[mta]
+bts1.inboxses.com     ansible_host=172.16.16.226
+inbox.boinmail.com    ansible_host=172.16.16.227
+mx1.inboxses.com      ansible_host=172.16.16.228
+
+

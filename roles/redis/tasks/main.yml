@@ -1,0 +1,57 @@
+---
+# tasks file for redis
+- name: removing  package
+  shell: apt-get -y remove redis-server* && apt-get -y purge redis-server*
+  ignore_errors: yes
+
+- name: clear /var/lib/redis
+  shell: rm -rf /var/lib/redis
+  ignore_errors: yes
+
+- name: Add APT repository
+  apt_repository:  
+    repo: "{{ redis_apt_repository }}"
+    update_cache: yes
+
+- name: Installing package
+  apt:
+    pkg: "{{ redis_package }}"
+    state: present
+
+- name: Remove redis default path
+  shell: service redis-server stop
+
+   
+  
+#- name: Create the default redis config file
+#  template: src=redis-server dest=/etc/default/redis-server mode=0655
+#  tags:
+#  - redis
+
+- name: Create data path of redis
+  file: path={{ redis_datapath }} state=directory  mode=0755 recurse=yes
+  
+- name: copy redis.conf cluster
+  template: src=cluster/{{ redis_conf }} dest=/etc/redis/{{ redis_conf }}
+  when: clustering
+  
+- name: copy redis.conf standalone
+  template: src=standalone/{{ redis_conf }} dest=/etc/redis/{{ redis_conf }}
+  when: not clustering
+
+- name: Create redis service file
+  template: src={{ service }}.service dest=/lib/systemd/system/{{ service }}.service mode=0644
+
+- name: Change Ownership of redis Directory
+  shell: chown -R redis.redis /var/lib/redis* 
+
+- name: systemctl daemon-reload
+  shell: systemctl daemon-reload;sudo systemctl enable redis-server
+  ignore_errors: yes
+  
+- name: service redis-server restart 
+  shell: service {{ service }} restart
+  ignore_errors: yes
+
+- include: cluster.yml
+  when: clustering

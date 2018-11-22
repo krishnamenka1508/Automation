@@ -1,0 +1,24 @@
+---
+- name: ensure nginx ssl directory is created
+  file: path=/etc/nginx/ssl state=directory
+  tags: install_ssl
+  
+- name: ensure nginx ssl betaout.com directory is created
+  file: path=/etc/nginx/ssl/betaout.com state=directory
+  tags: install_ssl
+  
+- name: ensure nginx ssl betaoutnotify.com directory is created
+  file: path=/etc/nginx/ssl/betaoutnotify.com state=directory
+  when: connectapi_conf_setup == True
+
+- name: copy betaout.com ssl certificates 
+  action: copy src={{ item }} dest=/etc/nginx/ssl/betaout.com/ force=yes
+  with_fileglob:
+    - roles/nginx/files/ssl/betaout.com/* 
+  tags: install_ssl
+
+- name: copy betaoutnotify.com ssl certificates 
+  action: copy src={{ item }} dest=/etc/nginx/ssl/betaoutnotify.com/ force=yes
+  with_fileglob:
+    - roles/nginx/files/ssl/betaoutnotify.com/*  
+  when: connectapi_conf_setup == True

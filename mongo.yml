@@ -1,0 +1,17 @@
+---
+# For all servers
+# ansible-playbook -vv mongo.yml -f 10
+
+# For limited servers
+# ansible-playbook -vv mongo.yml --limit=mn-sh-a1.betaout.org,mn-sh-a2.betaout.org,mn-sh-a3.betaout.org -f10
+
+- hosts: mn-sh-*
+  gather_facts: True
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson
+  roles:
+    - servertuning  
+    - mongodbcommon
+    - mongo
+    - omd_agent

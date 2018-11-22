@@ -1,0 +1,6 @@
+---
+# defaults file for filebeat
+es_ip: 172.16.16.117
+es_port: 5044
+java_apt_key: ppa:webupd8team/java
+elk_private_ip: 172.16.16.172

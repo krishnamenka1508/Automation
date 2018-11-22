@@ -1,0 +1,13 @@
+---
+## Install PECL extension Php MongoDB
+# https://github.com/gaspaio/ansible-repository/blob/master/php/tasks/pecl.yml
+
+- name: install mongodb
+  shell: pecl install mongodb
+  ignore_errors: yes
+  
+- name: mongoDB | pecl | deploy configuration
+  template: src=php7_conf.d_mongo.ini dest=/etc/php/7.0/mods-available/mongo.ini owner=root mode=0644
+  
+- name: enable php module mongo
+  shell: phpenmod mongo

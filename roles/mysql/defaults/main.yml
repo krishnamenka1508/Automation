@@ -1,0 +1,7 @@
+---
+# defaults file for mysql
+format_filesystem: True
+mount_filesystem: True
+optimized_ssd: sdc
+bindaddress: 0.0.0.0
+mysql_password: betaout

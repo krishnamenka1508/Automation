@@ -1,0 +1,21 @@
+---
+- name: ensure supervisor is installed
+  apt: 
+   name: supervisor
+   state: present   
+  when: supervisor_setup == True 
+  ignore_errors: yes
+
+
+- name: copy all supervisor conf file
+  action: copy src={{ item }} dest=/etc/supervisor/conf.d/ 
+  with_fileglob:
+    - files/supervisor/*.conf
+  when: supervisor_setup == True  
+
+  
+- name: service supervisor restart
+  shell: service supervisor restart
+  when: supervisor_setup == True
+
+  

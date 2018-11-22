@@ -1,0 +1,28 @@
+---
+- name: deploy key for git authentication
+  template: src=id_rsa  dest=~/.ssh/id_rsa owner=root mode=0400
+  ignore_errors: yes
+
+- name: create www directory
+  file: path=/var/www/ state=directory
+  ignore_errors: yes
+
+- name: clone jal
+  git: repo=git@bitbucket.org:betaout2/jal.git dest=/var/www/jal accept_hostkey=yes version="{{ GIT_VERSION }}"
+  ignore_errors: yes
+  
+- name: clone jalconfig
+  git: repo=git@bitbucket.org:betaout2/jalconfig.git dest=/var/www/jalconfig accept_hostkey=yes version="{{ GIT_VERSION }}"
+  ignore_errors: yes
+
+- name: clone foundation
+  git: repo=git@bitbucket.org:betaout2/foundation.git dest=/var/www/foundation accept_hostkey=yes version="{{ GIT_VERSION }}" 
+  ignore_errors: yes
+
+- name: clone shortenurl
+  git: repo=git@bitbucket.org:betaout2/shortenurl.git dest=/var/www/shortenurl accept_hostkey=yes version="{{ GIT_VERSION }}"
+  ignore_errors: yes
+  when: emailapi_conf_setup == True
+
+
+

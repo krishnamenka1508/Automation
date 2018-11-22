@@ -1,0 +1,13 @@
+rs.initiate()
+sleep(800)
+{% for host in groups['mongo'] %}
+{% if replSetName == hostvars[host].replSetName %}
+rs.add("{{ hostvars[host].private_ip }}:{{ hostvars[host].port }}")
+sleep(800)
+{% endif %}
+{% endfor %}
+printjson(rs.status())
+cfg = rs.conf()
+cfg.members[0].host = "{{ private_ip }}:{{ port }}"
+rs.reconfig(cfg,{force:true})
+printjson(rs.status())

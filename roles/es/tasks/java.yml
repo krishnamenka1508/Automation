@@ -1,0 +1,52 @@
+---
+- name: Remove Oracle Java 8
+  apt: name={{item}} state=absent
+  sudo: yes
+  with_items:
+    - oracle-java8-installer
+  ignore_errors: yes
+  tags:
+  - es
+  - java
+
+- name: add add-apt-repostory
+  apt: pkg=software-properties-common state=present update_cache=yes
+  sudo: yes 
+  tags:
+  - es
+  - java
+  
+- name: Add Java repository to sources
+  apt_repository: repo={{ java_apt_key }} state=present
+  tags:
+  - es
+  - java
+  
+- name: updates a server
+  apt: update_cache=yes
+  tags:
+  - es
+  - java
+  
+- name: Accept license
+  debconf:
+    name: 'oracle-java8-installer'
+    question: 'shared/accepted-oracle-license-v1-1'
+    value: 'true'
+    vtype: 'select'
+  ignore_errors: yes
+  tags:
+  - es
+  - java   
+  
+- name: Install Oracle Java 8
+  apt: name={{item}} state=latest
+  sudo: yes
+  with_items:
+    - oracle-java8-set-default  
+    - oracle-java8-installer
+    - ca-certificates
+  tags:
+  - es
+  - java
+  

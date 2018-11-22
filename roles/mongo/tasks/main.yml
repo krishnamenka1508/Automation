@@ -1,0 +1,44 @@
+---
+- include: disksetup.yml
+  when:
+    - service == "mongod" 
+    - format_filesystem == True
+
+- include: mongopathsetup.yml
+  when: service == "mongod"
+  
+- name: Create mongo service file
+  template: src=mongod.service dest=/lib/systemd/system/mongod.service mode=0644
+ 
+- name: copy /etc/mongod.conf
+  template: src={{ conf }}.conf dest=/etc/mongod.conf
+  tags: rpl_mongo_conf
+
+- include: roles/base/tasks/systemctl-daemon-reload.yml
+
+- name:  Restart mongod service 
+  shell: service mongod restart
+  ignore_errors: yes
+  tags: rpl_mongo_conf
+
+- name: Enable mongod on bootup and ensure it's started
+  service:
+    name: mongod
+    enabled: yes
+
+- include: disable-transparent-hugepages.yml    
+- include: sharding.yml
+  
+- include: fliphidden.yml
+  when: conf == "mongod"
+  tags: fliphidden
+  
+
+
+  
+
+
+  
+    
+
+

@@ -1,0 +1,9 @@
+---
+# defaults file for nginx
+nginx_ssl: True
+front_conf_setup: True
+api_conf_setup: True
+emailapi_conf_setup: True
+bulkapi_conf_setup: True
+connectapi_conf_setup: True
+mapi_conf_setup: True

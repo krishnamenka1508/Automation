@@ -1,0 +1,150 @@
+---
+# tasks file for bastion
+- name: acl
+  apt: name="acl" update_cache=yes state=present
+  
+- name: log directory
+  shell: "{{ item }}"
+  ignore_errors: yes
+  with_items:
+      # Create a new folder for the log files
+      - mkdir /var/log/bastion
+      - chown root:root /var/log/bastion
+      - chmod -R 770 /var/log/bastion
+      - setfacl -Rdm other:0 /var/log/bastion
+      
+      # Block some SSH features that bastion host users could use to circumvent the solution
+      - awk '!/AllowTcpForwarding/' /etc/ssh/sshd_config > temp && mv temp /etc/ssh/sshd_config
+      - awk '!/X11Forwarding/' /etc/ssh/sshd_config > temp && mv temp /etc/ssh/sshd_config
+      
+      # create bastion directory
+      - mkdir /usr/bin/bastion
+      
+
+# Make OpenSSH execute a custom script on logins
+- name: customize sshd_config
+  blockinfile:
+    path: /etc/ssh/sshd_config
+    marker: "# {mark} bastion"
+    block: |
+        ForceCommand /usr/bin/bastion/shell
+        #Comment "AllowTcpForwarding no" to allow ssh tunneling i.e, allow fabric/ansible to run from local machine to remote using bastion server as a gateway.
+        #AllowTcpForwarding no
+        X11Forwarding no
+
+- name: copy shell script
+  template: src=shell dest=/usr/bin/bastion/shell
+
+
+# Make the custom script executable
+- name: post shell install
+  shell: "{{item}}"
+  ignore_errors: yes
+  with_items:
+        # Make the custom script executable
+      - chmod a+x /usr/bin/bastion/shell
+      
+        # Bastion host users could overwrite and tamper with an existing log file 
+        # using "script" if they knew the exact file name. I take several measures 
+        # to obfuscate the file name:
+        # 1. Add a random suffix to the log file name.
+        # 2. Prevent bastion host users from listing the folder containing log 
+        # files. 
+        # This is done by changing the group owner of "script" and setting GID.
+      - chown root:root /usr/bin/script
+      - chmod g+s /usr/bin/script
+      
+        # 3. Prevent bastion host users from viewing processes owned by other 
+        # users, because the log file name is one of the "script" 
+        # execution parameters.
+        
+      - mount -o remount,rw,hidepid=2 /proc
+      - awk '!/proc/' /etc/fstab > temp && mv temp /etc/fstab
+      - echo "proc /proc proc defaults,hidepid=2 0 0" >> /etc/fstab
+      
+        # Restart the SSH service to apply /etc/ssh/sshd_config modifications.
+      - service ssh restart
+      
+- name: copy | send logs to s3
+  template: src=sync_s3 dest=/usr/bin/bastion/sync_s3
+
+- name: cron | send logs to s3
+  cron:
+    name: "send logs to s3"
+    minute: "*/5"
+    job: "/usr/bin/bastion/sync_s3"
+  
+- name: copy | sync users from s3
+  template: src=sync_users dest=/usr/bin/bastion/sync_users
+
+- name: cron | sync users
+  cron:
+    name: "sync users"
+    minute: "*/5"
+    job: "/usr/bin/bastion/sync_users"
+
+- name: scripts executable
+  shell: "{{item}}"
+  with_items:
+      - chmod 700 /usr/bin/bastion/sync_s3
+      - chmod 700 /usr/bin/bastion/sync_users
+    
+- include: roles/nginx/tasks/install.yml
+
+- name: copy | nginx conf
+  action: copy src={{ item }} dest=/etc/nginx/conf.d/  force=yes
+  with_fileglob:
+    - files/nginx/*.conf
+  tags: proxy
+  
+- include: roles/nginx/tasks/restart.yml
+  tags: proxy
+
+- name: modify firewall
+  shell: "{{item}}"
+  with_items:
+      - ufw allow proto tcp to any port 7000:11000 from {{office_ip}}
+      - ufw allow proto tcp to any port 7000:11000 from {{openvpn_ip}}
+      - ufw reload
+
+- name: aws configure
+  action: copy src={{ item }} dest=~/.aws/ mode=0600  force=yes
+  with_fileglob:
+    - roles/bastion/files/aws/*
+  tags: aws
+  
+- name: copy alias
+  blockinfile:
+    marker: "# {mark} Alias for Production Servers"
+    block: "{{ lookup('file', 'roles/bastion/templates/alias') }}"
+    dest: "/etc/bash.bashrc"
+    backup: yes
+  tags: alias
+
+
+#Add following line to run ForceCommand for all users other than root in /etc/ssh/sshd_config
+
+#Match User *,!root
+#        ForceCommand /usr/bin/bastion/shell
+
+
+
+#{
+#  "Version": "2012-10-17",
+#  "Statement": [
+#    {
+#      "Effect": "Allow",
+#      "Action": ["s3:ListBucket"],
+#      "Resource": ["arn:aws:s3:::bo-bastion"]
+#    },
+#    {
+#      "Effect": "Allow",
+#      "Action": [
+#        "s3:PutObject",
+#        "s3:GetObject",
+#        "s3:DeleteObject"
+#      ],
+#      "Resource": ["arn:aws:s3:::bo-bastion/*"]
+#    }
+#  ]
+#}

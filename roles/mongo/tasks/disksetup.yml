@@ -1,0 +1,21 @@
+---
+- name: Format the file system
+  shell: echo y | mkfs -t xfs -f {{ filesystem }} 
+  ignore_errors: yes
+
+- name: Create Data Folder
+  file: path={{ mounted_folder }} state=directory
+
+- name: Mount disk with Folder
+  shell: mount {{ filesystem }} {{ mounted_folder }}
+  ignore_errors: yes
+
+- name: get disk UUID
+  shell: blkid {{ filesystem }} | grep "UUID" | awk "{print \$2}"
+  register: uuid_output
+  ignore_errors: yes
+
+- name: Entry in fstab
+  lineinfile: line='{{ uuid_output.stdout }}   {{ mounted_folder }}   xfs    noatime  0   0' dest=/etc/fstab
+  ignore_errors: yes
+

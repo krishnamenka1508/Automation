@@ -1,0 +1,161 @@
+# Alias to connect to servers
+# Mongo group
+
+# mongo config group
+alias mn-cfg1="ssh root@172.16.16.5"
+alias mn-cfg2="ssh root@172.16.16.6"
+alias mn-cfg3="ssh root@172.16.16.7"
+
+# mongo rs0 group
+alias mn-sh-a1="ssh root@172.16.16.8"
+alias mn-sh-a1n="ssh root@172.16.16.17"
+alias mn-sh-a2="ssh root@172.16.16.9"
+alias mn-sh-a3="ssh root@172.16.16.10"
+
+# mongo rs1 group
+alias mn-sh-b1="ssh root@172.16.16.11"
+alias mn-sh-b2="ssh root@172.16.16.12"
+alias mn-sh-b3="ssh root@172.16.16.13"
+
+# mongo rs2 group
+alias mn-sh-c1="ssh root@172.16.16.14"
+alias mn-sh-c2="ssh root@172.16.16.15"
+alias mn-sh-c3="ssh root@172.16.16.16"
+
+# mongo lake Baikal group
+alias mn-baikal="ssh root@172.16.16.21"
+
+
+# mysql group
+alias mysql-master="ssh root@172.16.16.107"
+
+# redis group
+alias redis-a1="ssh root@172.16.16.30"
+alias redis-a2="ssh root@172.16.16.31"
+alias redis-b1="ssh root@172.16.16.32"
+alias redis-b2="ssh root@172.16.16.33"
+alias redis-c1="ssh root@172.16.16.34"
+alias redis-c2="ssh root@172.16.16.35"
+
+alias redismapi="ssh root@172.16.16.36"
+
+# rabbitmq group
+alias rmqs-ups1="ssh root@172.16.16.91"
+alias rmqs-ups2="ssh root@172.16.16.92"
+alias rmqs-downs1="ssh root@172.16.16.93"
+alias rmqs-downs2="ssh root@172.16.16.94"
+alias rmqs-sensitive1="ssh root@172.16.16.95"
+alias rmqs-nfes="ssh root@172.16.16.96"
+alias rmqs-nfes2="ssh root@172.16.16.99"
+alias rmqs-nflog="ssh root@172.16.16.97"
+alias rmqs-rollup="ssh root@172.16.16.98"
+
+# elk
+alias elk="ssh root@172.16.16.172"
+
+
+# front group
+alias front="ssh root@172.16.16.81"
+
+# api group
+alias api-1="ssh root@172.16.16.45"
+alias api-2="ssh root@172.16.16.46"
+alias em-api-1="ssh root@172.16.16.47"
+alias em-api-2="ssh root@172.16.16.48"
+alias m-api-1="ssh root@172.16.16.49"
+alias bulk-api-1="ssh root@172.16.16.50"
+alias misc-api="ssh root@172.16.16.51"
+alias m-api54-1="ssh root@172.16.16.52"
+
+
+# bg group
+alias bg1="ssh root@172.16.16.65"
+alias bg2="ssh root@172.16.16.66"
+alias bg3="ssh root@172.16.16.67"
+alias bg4="ssh root@172.16.16.68"
+alias bg5="ssh root@172.16.16.69"
+alias bg6="ssh root@172.16.16.70"
+alias bg7="ssh root@172.16.16.71"
+alias bg-em1="ssh root@172.16.16.72"
+alias bg-em2="ssh root@172.16.16.73"
+alias bg-em2="ssh root@172.16.16.73"
+alias worker-es-move="ssh root@172.16.16.74"
+
+# bg es54 group
+alias bg54-1="ssh root@172.16.16.75"
+alias bg54-2="ssh root@172.16.16.76"
+alias bg54-3="ssh root@172.16.16.77"
+alias bg54-4="ssh root@172.16.16.78"
+
+# elasticsearch group
+alias es2-logger-master="ssh root@172.16.16.117"
+alias es2-logger-node1="ssh root@172.16.16.118"
+alias es2-logger-node2="ssh root@172.16.16.119"
+
+alias es2-default-master="ssh root@172.16.16.120"
+alias es2-default-node1="ssh root@172.16.16.121"
+alias es2-default-node2="ssh root@172.16.16.122"
+alias es2-default-node3="ssh root@172.16.16.123"
+alias es2-default-node4="ssh root@172.16.16.124"
+alias es2-default-node5="ssh root@172.16.16.125"
+alias es2-default-node6="ssh root@172.16.16.159"
+alias es2-default-node7="ssh root@172.16.16.157"
+alias es2-default-node8="ssh root@172.16.16.176"
+alias es2-default-node10="ssh root@172.16.16.177"
+alias es2-default-node11="ssh root@172.16.16.178"
+alias es2-default-node12="ssh root@172.16.16.179"
+alias es2-default-node13="ssh root@172.16.16.162"
+
+alias es2-lenskart-master="ssh root@172.16.16.126"
+alias es2-lenskart-node1="ssh root@172.16.16.127"
+alias es2-lenskart-node2="ssh root@172.16.16.128"
+alias es2-lenskart-node3="ssh root@172.16.16.129"
+alias es2-lenskart-node4="ssh root@172.16.16.130"
+alias es2-lenskart-node5="ssh root@172.16.16.131"
+alias es2-lenskart-node6="ssh root@172.16.16.132"
+
+alias es2-ent-med-master="ssh root@172.16.16.133"
+alias es2-ent-med-node1="ssh root@172.16.16.134"
+alias es2-ent-med-node2="ssh root@172.16.16.135"
+alias es2-ent-med-node3="ssh root@172.16.16.136"
+
+alias es2-paytmarket-master="ssh root@172.16.16.137"
+alias es2-paytmarket-node1="ssh root@172.16.16.138"
+alias es2-paytmarket-node2="ssh root@172.16.16.139"
+alias es2-paytmarket-node3="ssh root@172.16.16.140"
+alias es2-paytmarket-node4="ssh root@172.16.16.141"
+alias es2-paytmarket-node5="ssh root@172.16.16.142"
+alias es2-paytmarket-node6="ssh root@172.16.16.143"
+alias es2-paytmarket-node8="ssh root@172.16.16.145"
+alias es2-paytmarket-node9="ssh root@172.16.16.163"
+alias es2-paytmarket-node10="ssh root@172.16.16.164"
+
+
+alias es2-tokopedia-master="ssh root@172.16.16.146"
+alias es2-tokopedia-node1="ssh root@172.16.16.147"
+alias es2-tokopedia-node2="ssh root@172.16.16.148"
+alias es2-tokopedia-node3="ssh root@172.16.16.149"
+alias es2-tokopedia-node4="ssh root@172.16.16.150"
+alias es2-tokopedia-node5="ssh root@172.16.16.151"
+alias es2-tokopedia-node6="ssh root@172.16.16.158"
+
+alias es5-default-master="ssh root@172.16.16.152"
+alias es5-default-node1="ssh root@172.16.16.153"
+alias es5-default-node2="ssh root@172.16.16.154"
+alias es5-default-node3="ssh root@172.16.16.155"
+alias es5-default-node4="ssh root@172.16.16.156"
+alias es5-default-node5="ssh root@172.16.16.160"
+alias es5-default-node6="ssh root@172.16.16.161"		
+
+alias es5-paytm-lifafa-master="ssh root@172.16.16.180"
+alias es5-paytm-lifafa-node1="ssh root@172.16.16.181"
+alias es5-paytm-lifafa-node2="ssh root@172.16.16.182"
+alias es5-paytm-lifafa-node3="ssh root@172.16.16.183"		
+alias es5-paytm-lifafa-node4="ssh root@172.16.16.184"
+
+
+# nagios
+alias nagios="ssh root@172.16.16.169"
+
+# devprod
+alias devprod="ssh root@172.16.16.170"

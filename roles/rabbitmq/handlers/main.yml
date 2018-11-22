@@ -1,0 +1,13 @@
+---
+# handlers file for rabbitmq 
+- name: systemctl daemon reload
+  shell: systemctl daemon-reload
+  
+- name: restart rabbitmq
+  service: name=rabbitmq-server state=restarted
+  
+- name: stop rabbitmq
+  service: name=rabbitmq-server state=stopped
+  
+- name: start rabbitmq
+  service: name=rabbitmq-server state=stopped

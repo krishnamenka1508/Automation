@@ -1,0 +1,10 @@
+---
+- hosts: es5
+  gather_facts: True
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson
+  roles:
+    - servertuning
+    - es5
+    - omd_agent

@@ -1,0 +1,5 @@
+---
+# defaults file for es5
+format_filesystem: False
+mount_filesystem: False
+java_apt_key: ppa:webupd8team/java

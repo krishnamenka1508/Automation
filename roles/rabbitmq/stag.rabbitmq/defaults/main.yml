@@ -1,0 +1,9 @@
+---
+# defaults file for rabbitmq
+format_filesystem: False
+mount_filesystem: False
+vhost_delay: False
+GIT_VERSION: master
+rabbitmq_user: gauser
+rabbitmq_password: get@#amplify249
+rabbitmq_tags: administrator

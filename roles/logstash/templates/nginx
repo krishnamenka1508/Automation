@@ -1,0 +1,4 @@
+NGINXAPIACCESS (?<resp_code>.*?)!~~!(?<req_tm>.*?)!~~!(?<time>.*?)!~~!(?<req_method>.*?)!~~!(?<scheme>.*?)!~~!(?<nginx_host>.*?)!~~!(?<req_uri>(?<end_point>[^(?|!~~!)]*).*?)!~~!(?<rem_addr>.*?)!~~!(?<referrer>.*?)!~~!(?<user_agent>.*?)!~~!(.*)
+NGINX_API_ACCESS_WITH_REQ_BODY (?<resp_code>.*?)!~~!(?<req_tm>.*?)!~~!(?<time>.*?)!~~!(?<req_method>.*?)!~~!(?<scheme>.*?)!~~!(?<nginx_host>.*?)!~~!(?<req_uri>(?<end_point>[^(?|!~~!)]*).*?)!~~!(?<rem_addr>.*?)!~~!(?<referrer>.*?)!~~!(?<user_agent>.*?)!~~!(?<remote_user>.*?)!~~!(?<body_bytes_sent>.*?)!~~!(?<http_x_forwarded_for>.*?)!~~!(?<upstream_header_time>.*?)!~~!(?<upstream_response_time>.*?)!~~!(?<req_body>.*)
+PROJECTID_FROM_REQ_BODY project_id\\x22:(?<optional_quote>(\\x22)?)(?<project_id>[\d]*)
+FULLCONTACT (?<resp_code>.*?)!~~!(?<time>.*?)!~~!(.*)

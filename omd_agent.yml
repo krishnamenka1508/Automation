@@ -1,0 +1,8 @@
+---
+- hosts: agent
+  gather_facts: True
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson python3
+  roles:
+    - omd_agent        

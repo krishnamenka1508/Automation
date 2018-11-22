@@ -1,0 +1,39 @@
+#!/bin/bash
+declare -i messages_ready;
+declare messages_ready=0;
+output="";
+perfdata="";
+rabbitmqadmin -H localhost -P 15672 -u gauser -p get@#amplify249  list queues name messages_ready |  {  while IFS= read -r line;
+	do
+		echo "$line" | awk -F '|'  '{;}' ;
+	read name messages_ready <<<$(IFS="|"; echo $line);
+	if (($messages_ready>=0 && $messages_ready<=50000))
+		then
+			continue;
+	output="$output"$'\n'"OK - In queue $name total $messages_ready message is ready.";
+	elif (($messages_ready>=50001 && $messages_ready<=500000))
+		then
+		output="$output WARNING - In queue $name total $messages_ready message is ready.";
+	perfdata="$perfdata '$name'=$messages_ready"
+	else (($messages_ready>500000))
+		output="$output CRITICAL - In queue $name total $messages_ready message is ready."
+			perfdata="$perfdata '$name'=$messages_ready"
+			fi;
+	done
+
+#perfdata="'idle'=10 'active'=200 'total'=400"
+	case "$output" in
+		*CRITICAL*)
+			echo "$output | ${perfdata}"
+			exit 2
+			;;
+		*WARNING*)
+			echo "$output | ${perfdata}"
+			exit 1
+			;;
+		*OK*)
+			echo "okay"
+			exit 0
+			;;
+		esac
+}

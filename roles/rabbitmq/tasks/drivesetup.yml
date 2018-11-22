@@ -1,0 +1,27 @@
+---
+- name: format data drive
+  shell: echo y | mkfs -t xfs -f {{ filesystem }} 
+
+- name: create data folder
+  file: path={{ mounted_folder }} state=directory
+
+- name: mount data drive
+  shell: mount {{ filesystem }} {{ mounted_folder }}
+
+- name: get disk UUID  
+  shell: blkid -s UUID -o value {{ filesystem }}
+  register: UUID
+
+- name: fstab entry
+  mount:
+    path: /data
+    src: UUID="{{ UUID.stdout }}"
+    fstype: xfs
+    opts: noatime
+    state: present
+
+  
+
+  
+  
+  

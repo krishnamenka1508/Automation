@@ -1,0 +1,10 @@
+---
+- name: install kibana
+  apt: name=kibana state=present
+  
+- name: start kibana on boot
+  service: name=kibana enabled=yes
+  
+- name:  restart kibana 
+  shell: service kibana restart
+  ignore_errors: yes

@@ -1,0 +1,136 @@
+---
+# tasks file for es
+- name: Ulimit
+  shell: ulimit -l unlimited
+  tags:
+  - es
+  
+- name: Format the file system
+  shell: echo y | mkfs -t xfs -f {{ filesystem }} 
+  when: format_filesystem == True
+  tags:
+  - es
+
+- name: Create Data Folder
+  file: path={{ mounted_folder }} state=directory
+  when: format_filesystem == True
+  tags:
+  - es
+  
+- name: Mount disk with Folder
+  shell: mount {{ filesystem }} {{ mounted_folder }}
+  when: mount_filesystem == True
+  tags:
+  - es
+  
+- name: Create variable from command
+  shell: blkid {{ filesystem }} | grep "UUID" | awk "{print \$2}"
+  register: uuid_output
+  when: mount_filesystem == True
+  tags:
+  - es
+  
+- name: Entry in fstab
+  lineinfile: line='{{ uuid_output.stdout }}   {{ mounted_folder }}   xfs    noatime  0   0' dest=/etc/fstab
+  when: mount_filesystem == True
+  tags:
+  - es
+  
+- name: Create es data,logs folder
+  file: path={{ item }}  state=directory mode=0755 recurse=yes
+  sudo: yes
+  with_items:
+    - "{{ mounted_folder }}esdata"
+    - "{{ mounted_folder }}logs"
+  tags:
+  - es
+
+- name: Remove Elasticsearch package 
+  shell: sudo apt-get -y --purge autoremove elasticsearch
+  tags:
+  - es
+  
+- name: clear /etc/default/elasticsearch
+  shell: rm -rf /etc/default/elasticsearch
+  ignore_errors: yes
+  tags:
+  - es 
+  
+- name: install jre
+  shell: sudo apt-get -y install default-jre
+  tags:
+  - es
+  
+- name: Add Elasticsearch repository key
+  apt_key: url="{{ es_apt_key }}" state=present
+  tags:
+  - es 
+  
+- name: Add elasticsearch repository
+  apt_repository: repo={{ es_apt_url }} state=present
+  tags:
+  - es 
+  
+- name: updates a server
+  apt: update_cache=yes
+  tags:
+  - es 
+  
+- name: Installing Elasticsearch package 
+  apt:
+    pkg: "{{ es_package }}"
+    state: present
+  tags:
+  - es 
+
+- name: Enable es on bootup and ensure it's started
+  shell: systemctl enable elasticsearch
+  tags:
+  - es
+
+- name: Create the elasticsearch configuration file
+  template: src={{ es_conf }} dest=/etc/elasticsearch/{{ es_conf }}
+  tags:
+  - es
+
+- name: Create the default configuration file
+  template: src=default-elasticsearch dest=/etc/default/elasticsearch
+  tags:
+  - es
+    
+- name: Create es service file
+  template: src={{ service_name }} dest=/usr/lib/systemd/system/{{ service_name }} mode=0644
+  tags:
+  - es
+  
+- name: Change Ownership of es Directory
+  shell: chown -R elasticsearch.elasticsearch {{ mounted_folder }}
+  tags:
+  - es
+
+- name: Es plugins
+  shell:  /usr/share/elasticsearch/bin/plugin install {{ item }}
+  with_items:
+    - royrusso/elasticsearch-hq/v2.0.3
+    - cloud-aws
+    - mapper-size
+  ignore_errors: yes
+  tags:
+  - es-plugins
+  
+- name: systemctl daemon-reload
+  shell: systemctl daemon-reload
+  ignore_errors: yes
+  tags:
+  - es
+  
+- include: snapshot.yml
+  when: es_snapshot
+  tags: es_snapshot
+  
+
+#- name: service elasticsearch restart 
+#  shell: service elasticsearch restart
+#  ignore_errors: yes
+#  tags:
+#  - es

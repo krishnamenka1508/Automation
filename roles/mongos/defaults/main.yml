@@ -1,0 +1,9 @@
+---
+# defaults file for mongos
+format_filesystem: True
+mount_filesystem: True
+replSet: csrs0 
+configDB: csrs0/10.132.20.239:27019
+replSetName1: rs1/10.136.56.32:27018 
+replSetName2: rs2/10.136.42.115:27018 
+replSetName3: rs3/10.136.58.200:27018

@@ -1,0 +1,10 @@
+---
+## Install PECL extension amqp
+- name: install amqp
+  shell: pecl install amqp
+  ignore_errors: yes
+
+- name: amqp | pecl | deploy configuration
+  template: src=php7_conf.d_amqp.ini dest=/etc/php/7.0/mods-available/amqp.ini owner=root mode=0644
+- name: Install enable amqp
+  command: phpenmod amqp

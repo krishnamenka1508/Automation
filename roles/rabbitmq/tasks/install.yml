@@ -1,0 +1,31 @@
+---
+- name: ensure python-software-properties is installed
+  apt: pkg=python-software-properties state=installed
+
+- name: add rabbitmq official apt repository
+  apt_repository:
+    repo: "deb http://www.rabbitmq.com/debian/ testing main"
+    state: present
+
+- name: add trusted key
+  apt_key:
+    url: "https://www.rabbitmq.com/rabbitmq-release-signing-key.asc"
+    state: present
+
+- name: adding key for erlang
+  shell: wget -c -O- http://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc | sudo apt-key add -
+
+- name: adding erlang repository
+  shell: echo "deb http://packages.erlang-solutions.com/ubuntu trusty contrib" | sudo tee -a /etc/apt/sources.list.d/erlang_solutions.list > /dev/null
+
+- name: erlang
+  apt: 
+    name: erlang-base-hipe
+    update_cache: yes
+    state: latest
+
+- name: install rabbitmq
+  apt: 
+    name: rabbitmq-server
+    update_cache: yes
+    state: installed

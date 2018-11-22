@@ -1,0 +1,11 @@
+---
+
+# ordering is important.
+- include: purge.yml
+
+- include: drivesetup.yml 
+  when: format_filesystem == True
+  
+- include: install.yml
+- include: tune.yml
+- include: configure.yml

@@ -1,0 +1,20 @@
+cluster.name: {{ cluster_name }}
+node.name: {{ node_name }}
+
+node.master: {{ node_master }}
+node.data: {{ node_data }}
+path.data: "{{ mounted_folder }}esdata"
+path.logs: "{{ mounted_folder }}logs"
+bootstrap.memory_lock: true
+
+network.bind_host: localhost,{{ private_ip }}
+network.publish_host: {{ private_ip }}
+discovery.zen.ping.unicast.hosts: {{ cluster_ips }}
+
+thread_pool.bulk.queue_size: 3000
+
+script.inline: true
+script.stored: true
+
+#indices.store.throttle.type: none
+indices.memory.index_buffer_size: 40%

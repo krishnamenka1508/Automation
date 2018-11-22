@@ -1,0 +1,30 @@
+---
+# tasks file for base  
+- include: apt.yml
+  when: apt_pkg_install == True
+  
+- name: remove "php7.0-snmp" package
+  apt:
+    name: php7.0-snmp
+    state: absent
+  
+- include: pear.yml
+  when: pear_pkg_install == True
+  
+## Install php-Mongodb
+- include: php-mongo.yml
+  when: php_mongodb_install == True
+  
+- include: php-rmq-amqp.yml
+  when: php_rabbitmq_install == True
+
+- include: php-redis.yml
+  when: php_redis_install == True  
+
+- include: git.yml
+  when: git_checkout == True
+  
+- include: supervisor.yml
+  when: supervisor_setup == True  
+
+- include: logrotate.yml

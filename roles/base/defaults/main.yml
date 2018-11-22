@@ -1,0 +1,15 @@
+---
+# defaults file for base
+php_mongodb_install: True
+php_redis_install: True
+apt_pkg_install: True
+pear_pkg_install: True
+git_checkout: True
+mysql_server_ip: 10.1.0.6
+apt_update: True
+betout_checkout: True
+php_rabbitmq_install: True
+GIT_VERSION: 'HEAD'
+supervisor_setup: True
+phpmyadmin_setup: True
+emailapi_conf_setup: True

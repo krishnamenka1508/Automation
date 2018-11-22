@@ -1,0 +1,24 @@
+---
+- name: deploy key for git authentication
+  template: src=roles/base/templates/id_rsa  dest=~/.ssh/id_rsa owner=root mode=0400
+  ignore_errors: yes
+  
+- name: install git
+  apt: name=git
+  ignore_errors: yes
+
+- name: clone backup script
+  git: repo=git@bitbucket.org:betaout2/script.git dest=/root/script accept_hostkey=yes
+
+- name: aws configure
+  action: copy src={{ item }} dest=~/.aws/ mode=0600  force=yes
+  with_fileglob:
+    - roles/mysql/templates/aws/*
+
+- name: cron mysql backup
+  cron:
+    name: "mysql backup"
+    minute: "10"
+    hour: "20"
+    job: "/root/script/mysql/mysqlbackup.sh >> /var/log/mysqlbackup.log 2>&1"
+

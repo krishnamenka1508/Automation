@@ -1,0 +1,25 @@
+---
+- hosts: mapi
+  gather_facts: False
+  vars:
+      supervisor_setup: False
+      phpmyadmin_setup: False
+      front_conf_setup: False
+      api_conf_setup: False
+      emailapi_conf_setup: False
+      bulkapi_conf_setup: False
+      connectapi_conf_setup: False
+      mapi_conf_setup: True
+#  gather_facts: no
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson
+  roles:
+    - servertuning  
+    - base
+    - nginx
+    - phpfpm
+    - mongodbcommon
+    - mongo
+    - filebeat
+    - omd_agent

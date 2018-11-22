@@ -1,0 +1,12 @@
+---
+- name: install sysfsutils
+  apt: name=sysfsutils update_cache=yes state=latest
+
+- name: disable | transparent hugepages
+  blockinfile:
+      path: /etc/sysfs.conf
+      marker: "# {mark} disable transparent hugepages"
+      block: |
+        kernel/mm/transparent_hugepage/defrag = never
+        kernel/mm/transparent_hugepage/enabled = never
+      

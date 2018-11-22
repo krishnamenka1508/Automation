@@ -1,0 +1,22 @@
+---
+- hosts: bg
+#  gather_facts: False
+  vars:
+      supervisor_setup: True
+      phpmyadmin_setup: False
+      emailapi_conf_setup: False
+
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson    
+  roles:
+    - servertuning  
+    - base  
+    - mongodbcommon
+    - mongo
+    - filebeat
+    - omd_agent
+    
+  
+  
+  

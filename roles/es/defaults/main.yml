@@ -1,0 +1,9 @@
+---
+# defaults file for es
+format_filesystem: False
+mount_filesystem: False
+es_apt_key: "https://packages.elastic.co/GPG-KEY-elasticsearch"
+es_apt_url: "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main"
+es_package: "elasticsearch"
+java_apt_key: ppa:webupd8team/java
+es_snapshot: False

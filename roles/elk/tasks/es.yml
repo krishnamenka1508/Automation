@@ -1,0 +1,46 @@
+---
+- include: roles/es5/tasks/apt.yml 
+
+- name: install elasticsearch
+  apt: name=elasticsearch state=present
+  
+- name: ensure es data directory is created
+  file: path={{ mounted_folder }}/es  state=directory   owner=elasticsearch group=elasticsearch  mode=0755 recurse=yes  
+  
+- name: ensure es log directory is created
+  file: path={{ mounted_folder }}/log  state=directory   owner=elasticsearch group=elasticsearch  mode=0755 recurse=yes
+
+- name: copy es conf
+  template: src={{ item }} dest=/etc/elasticsearch/{{ item | basename }} backup=yes
+  with_fileglob:
+    - roles/elk/templates/es/conf/*
+
+- name: copy es service file
+  template: 
+    src: "roles/elk/templates/es/elasticsearch.service"
+    dest: "/usr/lib/systemd/system/elasticsearch.service"
+    mode: 0644
+    backup: "yes"
+ 
+- include: roles/base/tasks/systemctl-daemon-reload.yml
+
+- name: es plugins
+  shell: /usr/share/elasticsearch/bin/elasticsearch-plugin install {{ item }}
+  with_items:
+    - repository-s3
+  ignore_errors: yes
+
+- name: es keystore - aws access key, secret key for repository-s3
+  shell: "{{ item }}"
+  with_items:
+    - /usr/share/elasticsearch/bin/elasticsearch-keystore create
+    - echo "{{s3_access_key}}" | /usr/share/elasticsearch/bin/elasticsearch-keystore add --stdin s3.client.default.access_key
+    - echo "{{s3_secret_key}}" | /usr/share/elasticsearch/bin/elasticsearch-keystore add --stdin s3.client.default.secret_key
+  ignore_errors: yes
+
+- name:  restart elasticsearch 
+  shell: service elasticsearch restart
+  ignore_errors: yes
+  
+- name: start elasticsearch on boot
+  service: name=elasticsearch enabled=yes

@@ -1,0 +1,33 @@
+---
+
+- name: create rabbitmq directories
+  file: path={{ mounted_folder }}/{{ rabbitmq_folder }}/{{ item }} state=directory
+  with_items:
+      - mnesia
+      - logs
+
+- name: rabbitmq ownership
+  shell: chown -R rabbitmq.rabbitmq {{ mounted_folder }}/{{ rabbitmq_folder }}
+  
+- name: rabbitMQ service replace
+  template: 
+      src: "rabbitmq-server.service"
+      dest: "/lib/systemd/system/{{ service_name }}.service"
+      owner: root
+      group: root
+      
+- include: roles/base/tasks/systemctl-daemon-reload.yml      
+- include: restart.yml
+
+- name: rabbitmq conf replace
+  template:
+    src: "{{ item }}"
+    dest: "/etc/{{ rabbitmq_folder }}/{{ item }}"
+    backup: yes
+  with_items:
+     - rabbitmq-env.conf
+     - rabbitmq.config
+
+- include: restart.yml
+
+  

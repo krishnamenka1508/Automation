@@ -1,0 +1,75 @@
+---
+- name: remove default guest user
+  rabbitmq_user: user=guest state=absent
+
+- name: rabbitmq plugins
+  rabbitmq_plugin:
+    names: rabbitmq_management,rabbitmq_federation,rabbitmq_federation_management,rabbitmq_shovel,rabbitmq_shovel_management
+    state: enabled
+
+- name: Install Rabbitmq-admin
+  shell: cd /usr/local/bin/ && wget https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_10/bin/rabbitmqadmin
+  notify: restart rabbitmq
+
+- name: Make executable rabbitMQ Admin
+  shell: chmod 744 /usr/local/bin/rabbitmqadmin
+  notify: restart rabbitmq
+
+- name: rabbitmq vhost
+  rabbitmq_vhost: name="{{ item }}" state=present
+  with_items:
+    - bov2-durable
+    - bov2-nf
+    - bov2-delay
+    - bov2-baikal
+
+- name: rabbitmq lazy policies
+  shell: "{{item}}"
+  with_items:
+      - rabbitmqctl set_policy -p bov2-durable lz "" '{"queue-mode":"lazy"}' --priority 0 --apply-to queues
+      - rabbitmqctl set_policy -p bov2-nf lz "" '{"queue-mode":"lazy"}' --priority 0 --apply-to queues
+      - rabbitmqctl set_policy -p bov2-delay lz "" '{"queue-mode":"lazy"}' --priority 0 --apply-to queues
+  when: not downstream
+
+- name: rabbitmq other policies
+  shell: "{{item}}"
+  with_items:
+      - rabbitmqctl set_policy -p bov2-durable lz-fd "" '{"queue-mode":"lazy","federation-upstream-set":"all"}' --priority 0 --apply-to queues
+      - rabbitmqctl set_policy -p bov2-durable rq-em "^email_activity_requeue$" '{"dead-letter-exchange":"email_activity_exchange","dead-letter-routing-key":"email_activity_key","message-ttl":600000}' --priority 1 --apply-to queues
+      - rabbitmqctl set_policy -p bov2-durable rqsms "^sms_activtity_requeue$" '{"dead-letter-exchange":"sms_activity_exchange","dead-letter-routing-key":"sms_activity_key","message-ttl":600000}' --priority 2 --apply-to queues
+  when: downstream
+
+- name: rabbitmq user
+  rabbitmq_user: 
+    user: "{{ item.user }}"
+    password: "{{ item.password }}"
+    tags: administrator
+    permissions:
+        - vhost: /
+          configure_priv: .*
+          read_priv: .*
+          write_priv: .*
+        - vhost: bov2-durable
+          configure_priv: .*
+          read_priv: .*
+          write_priv: .*
+        - vhost: bov2-nf
+          configure_priv: .*
+          read_priv: .*
+          write_priv: .*
+        - vhost: bov2-delay
+          configure_priv: .*
+          read_priv: .*
+          write_priv: .*
+        - vhost: bov2-baikal
+          configure_priv: .*
+          read_priv: .*
+          write_priv: .*
+    state: present
+  with_items:
+    - { user: "fuser", password: "gite9359c7" }
+    - { user: "gauser", password: "get@#amplify249" }
+
+- name: rabbitmq auto start on reboot
+  shell: systemctl enable rabbitmq-server
+  

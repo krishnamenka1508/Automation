@@ -1,0 +1,5 @@
+{% for host in groups['mongo'] %}
+sh.addShard("{{ replSetName1 }}")
+sh.addShard("{{ replSetName2 }}")
+{% endfor %}
+printjson(sh.status())

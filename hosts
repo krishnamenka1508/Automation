@@ -1,0 +1,291 @@
+# Begin Group Vars
+
+[bastion:vars]
+lvm=false
+
+
+[mongo:vars]
+filesystem=/dev/sda
+mounted_folder=/data
+format_filesystem=False
+data_path=db
+service=mongod
+mrpeFileName=mongo_mrpe.cfg
+
+[mongod:vars]
+port=27018
+conf=mongod
+
+[mongoc:vars]
+port=27019
+replSetName=csrs0
+conf=mongoc
+
+[mongos:vars]
+#configDB=csrs0/10.136.66.249:27019,10.136.67.11:27019,10.136.67.156:27019
+configDB=csrs0/172.16.16.5:27019,172.16.16.6:27019,172.16.16.7:27019
+port=27017
+service=mongos
+conf=mongos
+mrpeFileName=bg_mrpe.cfg
+
+[mongo:children]
+mongod
+mongoc
+#sharding
+
+[mongos:children]
+bg
+api
+front
+
+[api:vars]
+lvm=false
+mrpeFileName=api_mrpe.cfg
+supervisor_setup=False
+phpmyadmin_setup=False
+front_conf_setup=False
+api_conf_setup=False
+emailapi_conf_setup=False
+bulkapi_conf_setup=False
+connectapi_conf_setup=False
+mapi_conf_setup=False
+filebeat_conf_dir='mapi'
+
+[bg:vars]
+lvm=false
+mrpeFileName=bg_mrpe.cfg
+filebeat_conf_dir='bg'
+
+
+[front:vars]
+lvm=false
+mrpeFileName=fg_mrpe.cfg
+supervisor_setup=False
+phpmyadmin_setup=False
+front_conf_setup=True
+api_conf_setup=False
+emailapi_conf_setup=False
+bulkapi_conf_setup=False
+connectapi_conf_setup=False
+mapi_conf_setup=False
+filebeat_conf_dir='bg'
+
+[elk:vars]
+mounted_folder=/data
+elk=True
+
+
+
+[rabbitmq:vars]
+format_filesystem=False
+filesystem=/dev/sda
+mounted_folder=/data
+rabbitmq_folder=rabbitmq
+service_name=rabbitmq-server
+mrpeFileName=rabbitmq_mrpe.cfg
+
+
+[redis:vars]
+clustering=False
+redis_conf=redis.conf
+redis_port=7000
+redis_datapath=/var/lib/redis
+service=redis-server
+mrpeFileName=redis_mrpe.cfg
+maxmemory=120gb
+redis_trib_ips= 172.16.16.30:7000 172.16.16.31:7000 172.16.16.32:7000 172.16.16.33:7000 172.16.16.34:7000 172.16.16.35:7000
+# End Group Vars
+
+[esall:children]
+es2-logger
+es2-default
+es2-lenskart
+es2-ent-med
+es2-paytm
+es2-tokopedia
+es5-default
+es
+
+[bastion]
+bastion.betaout.org ansible_host=144.217.78.111 private_ip=172.16.16.171 hostname=bastion.betaout.org
+
+
+[redis]
+redismapi  ansible_host=158.69.54.125  private_ip=172.16.16.36 hostname=redismapi.betaout.org
+redis-a2  ansible_host=144.217.78.126  private_ip=172.16.16.31 hostname=redis-a2.betaout.org
+redis-b1  ansible_host=144.217.78.127  private_ip=172.16.16.32 hostname=redis-b1.betaout.org
+redis-b2  ansible_host=144.217.78.128  private_ip=172.16.16.33 hostname=redis-b2.betaout.org
+redis-c1  ansible_host=158.69.118.148  private_ip=172.16.16.34 hostname=redis-c1.betaout.org
+redis-c2  ansible_host=144.217.67.115  private_ip=172.16.16.35 hostname=redis-c2.betaout.org
+
+[es2-logger]
+es2-logger-master ansible_host=66.70.176.225  private_ip=172.16.16.117 node_name=es2-logger-master node_master=true  node_data=false hostname=es2-logger-master.betaout.org es_heap_size=16g
+es2-logger-node1 ansible_host=144.217.180.233 private_ip=172.16.16.118 node_name=es2-logger-node1  node_master=false node_data=true  hostname=es2-logger-node1.betaout.org  es_heap_size=30g
+es2-logger-node2 ansible_host=144.217.180.234 private_ip=172.16.16.119 node_name=es2-logger-node2  node_master=false node_data=true  hostname=es2-logger-node2.betaout.org  es_heap_size=30g
+
+[es2-default]
+es2-default-master ansible_host=144.217.76.111  private_ip=172.16.16.120 node_name=es2-default-master node_master=true  node_data=false hostname=es2-default-master.betaout.org es_heap_size=16g
+es2-default-node1 ansible_host=144.217.180.223 private_ip=172.16.16.121  node_name=es2-default-node1  node_master=false node_data=true  hostname=es2-default-node1.betaout.org  es_heap_size=30g
+es2-default-node2 ansible_host=144.217.180.224 private_ip=172.16.16.122  node_name=es2-default-node2  node_master=false node_data=true  hostname=es2-default-node2.betaout.org  es_heap_size=30g
+es2-default-node3 ansible_host=144.217.180.225 private_ip=172.16.16.123 node_name=es2-default-node3  node_master=false node_data=true  hostname=es2-default-node3.betaout.org  es_heap_size=30g
+es2-default-node4 ansible_host=144.217.180.226 private_ip=172.16.16.124  node_name=es2-default-node4  node_master=false node_data=true  hostname=es2-default-node4.betaout.org  es_heap_size=30g
+es2-default-node5 ansible_host=144.217.180.227 private_ip=172.16.16.125  node_name=es2-default-node5  node_master=false node_data=true  hostname=es2-default-node5.betaout.org  es_heap_size=30g
+es2-default-node6 ansible_host=144.217.180.240 private_ip=172.16.16.159 node_name=es2-default-node6  node_master=false node_data=true  hostname=es2-default-node6.betaout.org  es_heap_size=30g
+es2-default-node7 ansible_host=144.217.180.238 private_ip=172.16.16.157 node_name=es2-default-node7  node_master=false node_data=true  hostname=es2-default-node7.betaout.org  es_heap_size=30g
+es2-default-node8 ansible_host=144.217.68.133 private_ip=172.16.16.176 node_name=es2-default-node8  node_master=false node_data=true  hostname=es2-default-node8.betaout.org  es_heap_size=30g
+
+[es2-lenskart]
+es2-lenskart-master ansible_host=144.217.76.110  private_ip=172.16.16.126 node_name=es2-lenskart-master node_master=true  node_data=false hostname=es2-lenskart-master.betaout.org es_heap_size=16g
+es2-lenskart-node1 ansible_host=144.217.180.162 private_ip=172.16.16.127  node_name=es2-lenskart-node1  node_master=false node_data=true  hostname=es2-lenskart-node1.betaout.org  es_heap_size=30g
+es2-lenskart-node2 ansible_host=144.217.180.163 private_ip=172.16.16.128  node_name=es2-lenskart-node2  node_master=false node_data=true  hostname=es2-lenskart-node2.betaout.org  es_heap_size=30g
+es2-lenskart-node3 ansible_host=144.217.180.164 private_ip=172.16.16.129 node_name=es2-lenskart-node3  node_master=false node_data=true  hostname=es2-lenskart-node3.betaout.org  es_heap_size=30g
+es2-lenskart-node4 ansible_host=144.217.180.165 private_ip=172.16.16.130 node_name=es2-lenskart-node4  node_master=false node_data=true  hostname=es2-lenskart-node4.betaout.org  es_heap_size=30g
+es2-lenskart-node5 ansible_host=144.217.180.166 private_ip=172.16.16.131  node_name=es2-lenskart-node5  node_master=false node_data=true  hostname=es2-lenskart-node5.betaout.org  es_heap_size=30g
+es2-lenskart-node6 ansible_host=144.217.180.241 private_ip=172.16.16.132  node_name=es2-lenskart-node6  node_master=false node_data=true  hostname=es2-lenskart-node6.betaout.org  es_heap_size=30g
+
+[es2-ent-med]
+es2-ent-med-master ansible_host=144.217.76.109  private_ip=172.16.16.133 node_name=es2-ent-med-master node_master=true  node_data=false hostname=es2-ent-med-master.betaout.org es_heap_size=16g
+es2-ent-med-node1 ansible_host=144.217.180.159 private_ip=172.16.16.134 node_name=es2-ent-med-node1  node_master=false node_data=true  hostname=es2-ent-med-node1.betaout.org  es_heap_size=30g
+es2-ent-med-node2 ansible_host=144.217.180.160 private_ip=172.16.16.135 node_name=es2-ent-med-node2  node_master=false node_data=true  hostname=es2-ent-med-node2.betaout.org  es_heap_size=30g
+es2-ent-med-node3 ansible_host=144.217.180.161 private_ip=172.16.16.136 node_name=es2-ent-med-node3  node_master=false node_data=true  hostname=es2-ent-med-node3.betaout.org  es_heap_size=30g
+
+[es2-paytm]
+es2-paytm-master ansible_host=66.70.176.223  private_ip=172.16.16.137 node_name=es2-paytm-master node_master=true  node_data=false hostname=es2-paytm-master.betaout.org es_heap_size=16g
+es2-paytm-node1 ansible_host=144.217.180.167 private_ip=172.16.16.138  node_name=es2-paytm-node1  node_master=false node_data=true  hostname=es2-paytm-node1.betaout.org  es_heap_size=30g
+es2-paytm-node2 ansible_host=144.217.180.168 private_ip=172.16.16.139  node_name=es2-paytm-node2  node_master=false node_data=true  hostname=es2-paytm-node2.betaout.org  es_heap_size=30g
+es2-paytm-node3 ansible_host=144.217.180.169 private_ip=172.16.16.140 node_name=es2-paytm-node3  node_master=false node_data=true  hostname=es2-paytm-node3.betaout.org  es_heap_size=30g
+es2-paytm-node4 ansible_host=144.217.180.218 private_ip=172.16.16.141 node_name=es2-paytm-node4  node_master=false node_data=true  hostname=es2-paytm-node4.betaout.org  es_heap_size=30g
+es2-paytm-node5 ansible_host=144.217.180.219 private_ip=172.16.16.142  node_name=es2-paytm-node5 node_master=false node_data=true  hostname=es2-paytm-node5.betaout.org  es_heap_size=30g
+es2-paytm-node6 ansible_host=144.217.180.220 private_ip=172.16.16.143  node_name=es2-paytm-node6  node_master=false node_data=true  hostname=es2-paytm-node6.betaout.org  es_heap_size=30g
+es2-paytm-node7 ansible_host=144.217.180.221 private_ip=172.16.16.144  node_name=es2-paytm-node7  node_master=false node_data=true  hostname=es2-paytm-node7.betaout.org  es_heap_size=30g
+es2-paytm-node8 ansible_host=144.217.180.222 private_ip=172.16.16.145  node_name=es2-paytm-node8  node_master=false node_data=true  hostname=es2-paytm-node8.betaout.org  es_heap_size=30g
+
+[es2-tokopedia]
+es2-tokopedia-master ansible_host=144.217.76.112  private_ip=172.16.16.146 node_name=es2-tokopedia-master node_master=true  node_data=false hostname=es2-tokopedia-master.betaout.org es_heap_size=16g
+es2-tokopedia-node1 ansible_host=144.217.180.228 private_ip=172.16.16.147  node_name=es2-tokopedia-node1  node_master=false node_data=true  hostname=es2-tokopedia-node1.betaout.org  es_heap_size=30g
+es2-tokopedia-node2 ansible_host=144.217.180.229 private_ip=172.16.16.148  node_name=es2-tokopedia-node2  node_master=false node_data=true  hostname=es2-tokopedia-node2.betaout.org  es_heap_size=30g
+es2-tokopedia-node3 ansible_host=144.217.180.230 private_ip=172.16.16.149 node_name=es2-tokopedia-node3  node_master=false node_data=true  hostname=es2-tokopedia-node3.betaout.org  es_heap_size=30g
+es2-tokopedia-node4 ansible_host=144.217.180.231 private_ip=172.16.16.150 node_name=es2-tokopedia-node4  node_master=false node_data=true  hostname=es2-tokopedia-node4.betaout.org  es_heap_size=30g
+es2-tokopedia-node5 ansible_host=144.217.180.232 private_ip=172.16.16.151  node_name=es2-tokopedia-node5  node_master=false node_data=true  hostname=es2-tokopedia-node5.betaout.org  es_heap_size=30g
+es2-tokopedia-node6 ansible_host=144.217.180.239 private_ip=172.16.16.158 node_name=es2-tokopedia-node6  node_master=false node_data=true  hostname=es2-tokopedia-node6.betaout.org  es_heap_size=30g
+
+[es5-default]
+es5-default-master ansible_host=66.70.176.224  private_ip=172.16.16.152 node_name=es5-default-master node_master=true  node_data=false hostname=es5-default-master.betaout.org es_heap_size=16g
+es5-default-node3 ansible_host=144.217.180.237 private_ip=172.16.16.155 node_name=es5-default-node3  node_master=false node_data=true  hostname=es5-default-node3.betaout.org  es_heap_size=30g
+
+[es5-tokopedia]
+es5-tokopedia-master ansible_host=66.70.176.226  private_ip=172.16.16.156 node_name=es5-tokopedia-master node_master=true  node_data=false hostname=es5-tokopedia-master.betaout.org es_heap_size=16g
+
+
+[es]
+es2-default-node12.betaout.org  ansible_host=144.217.70.169  private_ip=172.16.16.179 node_name=es2-default-node12  node_master=false node_data=true  hostname=es2-default-node12.betaout.org  es_heap_size=30g
+es2-default-node13.betaout.org  ansible_host=144.217.74.50 private_ip=172.16.16.162 node_name=es2-default-node13 node_master=false node_data=true  hostname=es2-default-node13.betaout.org  es_heap_size=30g
+
+
+[es:vars]
+cluster_ips='["172.16.16.120","172.16.16.121","172.16.16.122","172.16.16.123","172.16.16.124","172.16.16.125","172.16.16.159","172.16.16.157","172.16.16.176","172.16.16.177","172.16.16.178","172.16.16.179","172.16.16.162"]'
+cluster_name=es2-default
+filesystem=/dev/sda
+es_conf=elasticsearch.yml
+service_name=elasticsearch.service
+mounted_folder=/data/
+http_port=9200
+transport_port=9300
+service=elasticsearch
+mrpeFileName=es_mrpe.cfg
+
+[es5]
+es5-default-node4.betaout.org  ansible_host=144.217.67.42   private_ip=172.16.16.156 node_name=es5-default-node4  node_master=false node_data=true  hostname=es5-default-node4.betaout.org   es_heap_size=30g
+es5-default-node5.betaout.org  ansible_host=144.217.70.167  private_ip=172.16.16.160 node_name=es5-default-node5  node_master=false node_data=true  hostname=es5-default-node5.betaout.org   es_heap_size=30g
+es5-default-node6.betaout.org  ansible_host=144.217.70.168   private_ip=172.16.16.161 node_name=es5-default-node6  node_master=false node_data=true  hostname=es5-default-node6.betaout.org   es_heap_size=30g
+
+[es5:vars]
+cluster_ips='["172.16.16.152","172.16.16.153","172.16.16.154","172.16.16.155","172.16.16.156","172.16.16.160","172.16.16.161"]'
+cluster_name=es5-default
+filesystem=/dev/sda
+es_conf=elasticsearch.yml
+service_name=elasticsearch.service
+mounted_folder=/data/
+http_port=9200
+transport_port=9300
+service=elasticsearch
+mrpeFileName=es_mrpe.cfg
+
+
+[rabbitmq]
+#rmqs-ups1.betaout.org       ansible_host=144.217.181.115 private_ip=172.16.16.91 hostname=rmqs-ups1.betaout.org downstream=False
+#rmqs-ups2.betaout.org       ansible_host=144.217.181.116 private_ip=172.16.16.92 hostname=rmqs-ups2.betaout.org downstream=False
+#rmqs-downs1.betaout.org     ansible_host=144.217.181.117 private_ip=172.16.16.93 hostname=rmqs-downs1.betaout.org downstream=True
+#rmqs-downs2.betaout.org     ansible_host=144.217.181.118 private_ip=172.16.16.94 hostname=rmqs-downs2.betaout.org downstream=True
+#rmqs-sensitive1.betaout.org ansible_host=144.217.181.119 private_ip=172.16.16.95 hostname=rmqs-sensitive1.betaout.org downstream=False
+#rmqs-nfes.betaout.org       ansible_host=144.217.181.120 private_ip=172.16.16.96 hostname=rmqs-nfes.betaout.org downstream=False
+#rmqs-nflog.betaout.org      ansible_host=144.217.181.121 private_ip=172.16.16.97 hostname=rmqs-nflog.betaout.org downstream=False
+
+rmqs-rollup.betaout.org      ansible_host=144.217.182.41 private_ip=172.16.16.98 hostname=rmqs-rollup.betaout.org downstream=False
+
+
+[mysql]
+mysql-master.betaout.org  ansible_host=66.70.176.231 private_ip=172.16.16.107  mounted_folder=/data/ filesystem=/dev/sdb datadir=mysql mrpeFileName=mysql_mrpe.cfg hostname=mysql-master.betaout.org
+
+[mongoc]
+mn-cfg1.betaout.org  ansible_host=66.70.176.232 private_ip=172.16.16.5 hostname=mn-cfg1.betaout.org 
+mn-cfg2.betaout.org  ansible_host=66.70.176.233 private_ip=172.16.16.6 hostname=mn-cfg2.betaout.org
+mn-cfg3.betaout.org  ansible_host=66.70.176.234 private_ip=172.16.16.7 hostname=mn-cfg3.betaout.org
+
+[mongod]
+mn-sh-a1.betaout.org ansible_host=66.70.177.145 private_ip=172.16.16.8 replSetName=rs0 hostname=mn-sh-a1.betaout.org
+mn-sh-a2.betaout.org ansible_host=66.70.177.136 private_ip=172.16.16.9 replSetName=rs0 hostname=mn-sh-a2.betaout.org
+mn-sh-a3.betaout.org ansible_host=66.70.177.137 private_ip=172.16.16.10 replSetName=rs0 hostname=mn-sh-a3.betaout.org
+
+mn-sh-b1.betaout.org ansible_host=66.70.177.141 private_ip=172.16.16.11 replSetName=rs1 hostname=mn-sh-b1.betaout.org
+mn-sh-b2.betaout.org ansible_host=66.70.177.138 private_ip=172.16.16.12 replSetName=rs1 hostname=mn-sh-b2.betaout.org
+mn-sh-b3.betaout.org ansible_host=66.70.177.140 private_ip=172.16.16.13 replSetName=rs1 hostname=mn-sh-b3.betaout.org
+
+mn-sh-c1.betaout.org ansible_host=66.70.177.139 private_ip=172.16.16.14 replSetName=rs2 hostname=mn-sh-c1.betaout.org
+mn-sh-c2.betaout.org ansible_host=66.70.177.142 private_ip=172.16.16.15 replSetName=rs2 hostname=mn-sh-c2.betaout.org
+mn-sh-c3.betaout.org ansible_host=66.70.177.143 private_ip=172.16.16.16 replSetName=rs2 hostname=mn-sh-c3.betaout.org
+
+mn-sh-a1n.betaout.org ansible_host=149.56.23.160 private_ip=172.16.16.17 replSetName=rs0 hostname=mn-sh-a1n.betaout.org
+
+[sharding]
+#sharding-bg    ansible_host=162.243.163.59 private_ip=10.136.29.244  port=27017 conf=mongos sharding=True
+
+
+[bg]
+#bg-1.betaout.org	ansible_host=144.217.180.152	private_ip=172.16.16.65 hostname=bg-1.betaout.org
+#bg-2.betaout.org	ansible_host=144.217.180.153	private_ip=172.16.16.66 hostname=bg-2.betaout.org
+#bg-3.betaout.org	ansible_host=144.217.180.154	private_ip=172.16.16.67 hostname=bg-3.betaout.org
+#bg-4.betaout.org	ansible_host=144.217.180.155	private_ip=172.16.16.68 hostname=bg-4.betaout.org
+#bg-5.betaout.org	ansible_host=144.217.180.156	private_ip=172.16.16.69 hostname=bg-5.betaout.org
+#bg-6.betaout.org	ansible_host=144.217.180.157	private_ip=172.16.16.70 hostname=bg-6.betaout.org
+#bg-7.betaout.org	ansible_host=144.217.180.158	private_ip=172.16.16.71 hostname=bg-7.betaout.org
+#bg-em1.betaout.org      ansible_host=144.217.180.235    private_ip=172.16.16.153 hostname=bg-em1.betaout.org
+#bg-em2.betaout.org       ansible_host=144.217.180.236   private_ip=172.16.16.154 hostname=bg-em2.betaout.org
+#zookeeper1	ansible_host=138.197.38.35	private_ip=10.132.121.135 hostname=zookeeper1
+
+bg54-4.betaout.org   ansible_host=144.217.70.165	private_ip=172.16.16.78 hostname=bg54-4.betaout.org
+
+[api]
+
+paytm-lifafa-mapi.betaout.org  ansible_host=158.69.126.52 private_ip=172.16.16.52 hostname=paytm-lifafa-mapi.betaout.org mapi_conf_setup=True filebeat_conf_dir='mapi'
+
+#api-1.betaout.org  ansible_host=142.44.138.92 private_ip=172.16.16.45 hostname=api-1.betaout.org api_conf_setup=True
+#api-2.betaout.org  ansible_host=142.44.138.93 private_ip=172.16.16.46 hostname=api-2.betaout.org api_conf_setup=True
+
+#em-api-1.betaout.org  ansible_host=142.44.138.94 private_ip=172.16.16.47 hostname=em-api-1.betaout.org mrpeFileName=em_api_mrpe.cfg emailapi_conf_setup=True logstash_rmqs_host=172.16.16.93
+#em-api-2.betaout.org  ansible_host=142.44.138.95 private_ip=172.16.16.48 hostname=em-api-2.betaout.org mrpeFileName=em_api_mrpe.cfg emailapi_conf_setup=True logstash_rmqs_host=172.16.16.94
+
+#bulk-api-1.betaout.org  ansible_host=144.217.255.194 private_ip=172.16.16.50 hostname=bulk-api-1.betaout.org bulkapi_conf_setup=True connectapi_conf_setup=True
+
+#misc-api.betaout.org  ansible_host=142.44.138.91 private_ip=172.16.16.51 hostname=misc-api.betaout.org
+
+[frontca]
+front.betaout.org  ansible_host=66.70.176.229 private_ip=172.16.16.81  hostname=front.betaout.org
+
+[front]
+frontsg.betaout.org  ansible_host=139.99.120.110 private_ip=172.16.16.82  hostname=frontsg.betaout.org
+
+[elk]
+elk.betaout.org  ansible_host=66.70.176.227 private_ip=172.16.16.172 hostname=elk.betaout.org
+

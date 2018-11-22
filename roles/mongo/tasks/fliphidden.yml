@@ -1,0 +1,13 @@
+---
+- name: install git 
+  apt: name=git update_cache=yes state=latest
+
+- name: clone heptagon
+  git: repo=https://github.com/jeetusb/heptagon.git dest=/root/heptagon accept_hostkey=yes
+
+- name: cron mongo-flip-hidden
+  cron:
+    name: "mongo-flip-hidden"
+    minute: "*/8"
+    job: "mongo localhost:27018 /root/heptagon/mongo-flip-hidden.js  >> /var/log/mongo-flip-hidden.log 2>&1"
+

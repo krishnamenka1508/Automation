@@ -1,0 +1,122 @@
+{
+    "mappings": {
+        "_default_": {
+            "_all": {
+                "enabled": true,
+                "norms": {
+                    "enabled": false
+                }
+            },
+            "dynamic_templates": [
+                {
+                    "template1": {
+                        "mapping": {
+                            "doc_values": true,
+                            "ignore_above": 1024,
+                            "index": "not_analyzed",
+                            "type": "{dynamic_type}"
+                        },
+                        "match": "*"
+                    }
+                }
+            ],
+            "properties": {
+                "@timestamp": {
+                    "type": "date"
+                },
+                "message": {
+                    "type": "string",
+                    "index": "analyzed"
+                },
+                "resp_code": {
+                    "type": "integer"
+                },
+                "req_tm": {
+                    "type": "float"
+                },
+                "req_method": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "scheme": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "nginx_host": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "project_id": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "req_uri": {
+                    "type": "string",
+                    "index": "analyzed"
+                },
+                "end_point": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "req_body": {
+                    "type": "string",
+                    "index": "analyzed"
+                },
+                "rem_addr": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "referrer": {
+                    "type": "string",
+                    "index": "analyzed"
+                },
+                "user_agent": {
+                    "type": "string",
+                    "index": "analyzed"
+                },
+                "rem_user": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "byte_sent": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "x-forwarded_for": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "up_header_time": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "up_resp_time": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "nginx_host": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "offset": {
+                    "type": "long",
+                    "doc_values": "true"
+                },
+                "geoip": {
+                    "type": "object",
+                    "dynamic": true,
+                    "properties": {
+                        "location": {
+                            "type": "geo_point"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings": {
+        "index.refresh_interval": "5s",
+        "index.number_of_replicas" : "0"
+    },
+    "template": "filebeat-*"
+}

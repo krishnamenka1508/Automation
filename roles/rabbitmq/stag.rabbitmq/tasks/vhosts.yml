@@ -1,0 +1,79 @@
+---
+- name: Change By default Password of rabbitmq
+  shell: rabbitmqctl change_password guest guestnewpwd
+  tags:
+    - rabbitmq
+
+- name: Create Rabbitmq User gauser
+  shell: rabbitmqctl add_user {{ rabbitmq_user }} {{ rabbitmq_password }} && rabbitmqctl set_user_tags {{ rabbitmq_user }} {{ rabbitmq_tags }}
+  tags:
+    - rabbitmq
+    - rqdelay
+    
+- name: Create Rabbitmq User fuser
+  shell: rabbitmqctl add_user fuser gite9359c7 && rabbitmqctl set_user_tags fuser {{ rabbitmq_tags }}
+  tags:
+    - rabbitmq
+    - rqdelay    
+        
+#- name: Ensure rabbitmq user
+#  rabbitmq_user:
+#    user: "{{ item[0] }}"
+#    password: "{{ item[1] }}"
+#    vhost: "{{ item[2] }}"
+#    configure_priv: ".*"
+#    read_priv: ".*"
+#    write_priv: ".*"
+#    tags: "administrator"
+#    state: "present"   
+#    with_nested:
+#        - ['gauser', 'get@#amplify249','/']
+#        - ['fuser', 'gite9359c7','/']
+#      
+#  tags:
+#    - rabbitmq
+#    - rqdelay
+#    - kk
+    
+- name: Ensure Rabbitmq vhost
+  rabbitmq_vhost: name={{ item }} state=present
+  with_items:
+      - bo-v2durable
+      - bo-v2nf
+  tags:
+    - rabbitmq
+    - rqdelay
+    
+- name: Ensure Rabbitmq vhost
+  rabbitmq_vhost: name=bo-v2delay state=present
+  when: vhost_delay == True
+  tags:
+    - rabbitmq
+    - rqdelay
+    
+- name: Set Permissions for gauser
+  shell: rabbitmqctl set_permissions -p {{ item }} gauser ".*" ".*" ".*"
+  with_items:
+      - /
+      - bo-v2durable
+      - bo-v2nf
+  tags:
+    - rabbitmq
+    
+- name: Set Permissions for fuser
+  shell: rabbitmqctl set_permissions -p {{ item }} fuser ".*" ".*" ".*"
+  with_items:
+      - /
+      - bo-v2durable
+
+  tags:
+    - rabbitmq    
+    
+- name: Set Permissions for delay vhost
+  shell: rabbitmqctl set_permissions -p bo-v2delay gauser ".*" ".*" ".*"
+  when: vhost_delay == True
+  tags:
+    - rabbitmq
+    - rqdelay
+         
+

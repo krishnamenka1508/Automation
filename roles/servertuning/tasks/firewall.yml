@@ -1,0 +1,20 @@
+---
+
+- name: Install Ufw
+  apt: name=ufw state=present
+  ignore_errors: yes
+  
+- name: Allow Ufw
+  shell: "{{item}}"
+  ignore_errors: yes
+  with_items:
+      - ufw allow ssh
+      - ufw default deny incoming
+      - ufw default allow outgoing
+      - ufw allow from {{private_subnet_block}}
+
+- name: Enable Ufw
+  shell: "echo y | ufw enable"
+  ignore_errors: yes
+        
+        

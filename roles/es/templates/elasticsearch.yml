@@ -1,0 +1,34 @@
+index.number_of_shards: 20
+index.number_of_replicas: 1
+
+cluster.name: {{ cluster_name }}
+node.name: {{ node_name }}
+
+node.master: {{ node_master }}
+node.data: {{ node_data }}
+path.data: "{{ mounted_folder }}esdata"
+path.logs: "{{ mounted_folder }}logs"
+bootstrap.memory_lock: true
+
+network.host: localhost,{{ private_ip }}
+discovery.zen.ping.multicast.enabled: false
+discovery.zen.ping.unicast.hosts: {{ cluster_ips }}
+
+script.inline: true
+script.indexed: true
+
+indices.store.throttle.type: none
+index.merge.policy.reclaim_deletes_weight: 3.0
+index.merge.policy.max_merge_at_once: 5
+index.merge.policy.segments_per_tier: 5
+threadpool.bulk.queue_size: 3000
+indices.memory.index_buffer_size: 40%
+indices.fielddata.cache.size: 40%
+index.refresh_interval: 3s
+index.translog.flush_threshold_size: 1gb
+
+cloud:
+  aws:
+    access_key: AKIAJWKUT2PEQ66QTUYA
+    secret_key: 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
+

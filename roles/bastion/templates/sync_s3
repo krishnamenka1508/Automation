@@ -1,0 +1,8 @@
+#!/bin/bash
+# As cron does not supply PATH env variable, it has to be explicitly defined for smooth running of each command.
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+
+# Copy log files to S3 with server-side encryption enabled.
+# Then, if successful, delete log files that are older than a day.
+LOG_DIR="/var/log/bastion/"
+aws s3 cp $LOG_DIR s3://bo-bastion/logs/ --storage-class=STANDARD_IA --sse --recursive && find $LOG_DIR* -mtime +1 -exec rm {} \;

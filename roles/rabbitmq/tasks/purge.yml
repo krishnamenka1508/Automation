@@ -1,0 +1,4 @@
+---
+# tasks file for rabbitmq
+- name: remove rabbitmq package 
+  shell: sudo apt-get -y purge rabbitmq-server

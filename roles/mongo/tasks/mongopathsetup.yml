@@ -1,0 +1,6 @@
+---
+- name: ensure mongo log directory is created
+  file: path={{ mounted_folder }}/log  state=directory   owner=mongodb group=mongodb  mode=0755 recurse=yes
+  
+- name: ensure mongo sharding directory is created
+  shell: mkdir -p {{ mounted_folder }}/{{ data_path }}  && chown -R mongodb:mongodb {{ mounted_folder }}/{{ data_path }} 

@@ -1,0 +1,72 @@
+---
+# tasks file for nginx
+- name: debug
+  debug:
+      msg: "api_conf_setup={{api_conf_setup}} emailapi_conf_setup={{emailapi_conf_setup}} bulkapi_conf_setup={{bulkapi_conf_setup}} connectapi_conf_setup={{connectapi_conf_setup}} mapi_conf_setup={{mapi_conf_setup}}"
+  tags: debugvars
+  ignore_errors: yes
+
+- include: install.yml
+
+- include: ssl.yml
+  when: nginx_ssl == True  
+
+- name: remove apache2
+  apt: name="apache2"  update_cache=yes  state=absent force=yes
+  
+- name: clean conf.d
+  shell: rm -rf /etc/nginx/conf.d/*
+
+- name: copy all api conf 
+  action: copy src={{ item }} dest=/etc/nginx/conf.d/  force=yes
+  with_fileglob:
+    - files/api/*.conf
+  when: api_conf_setup == True
+  
+- name: copy all emailapi conf 
+  action: copy src={{ item }} dest=/etc/nginx/conf.d/  force=yes
+  with_fileglob:
+    - files/emailapi/*.conf
+  when: emailapi_conf_setup == True
+  
+- name: copy all bulkapi conf 
+  action: copy src={{ item }} dest=/etc/nginx/conf.d/  force=yes
+  with_fileglob:
+    - files/bulkapi/*.conf
+  when: bulkapi_conf_setup == True
+
+- name: copy all connectapi conf 
+  action: copy src={{ item }} dest=/etc/nginx/conf.d/  force=yes
+  with_fileglob:
+    - files/connectapi/*.conf
+  when: connectapi_conf_setup == True
+  
+- name: copy all mapi conf 
+  action: copy src={{ item }} dest=/etc/nginx/conf.d/  force=yes
+  with_fileglob:
+    - files/mapi/*.conf
+  when: mapi_conf_setup == True
+  
+
+- name: copy all front conf file
+  action: copy src={{ item }} dest=/etc/nginx/conf.d/  force=yes
+  with_fileglob:
+    - files/front/*.conf
+  when: front_conf_setup == True
+
+- include: restart.yml
+
+- name: allow http/https | firewall
+  shell: "{{item}}"
+  ignore_errors: yes
+  with_items:
+      - ufw allow http
+      - ufw allow https
+      - ufw reload
+  when: firewall
+
+- name: import logstash in case of email api
+  include_role:
+    name: logstash
+  when: emailapi_conf_setup
+

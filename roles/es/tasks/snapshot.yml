@@ -1,0 +1,94 @@
+---
+- name: deploy key for git authentication
+  template: src=roles/base/templates/id_rsa  dest=~/.ssh/id_rsa owner=root mode=0400
+  ignore_errors: yes
+  
+- name: install git
+  apt: name=git
+  ignore_errors: yes
+
+- name: clone backup script
+  git: repo=git@bitbucket.org:betaout2/script.git dest=/root/script accept_hostkey=yes
+
+
+
+# Begin elasticSearch snapshots
+
+- name: default snapshot
+  cron:
+    name: "default snapshot"
+    minute: "10"
+    hour: "4"
+    job: "/root/script/es/snapshot_default.sh >> /var/log/es-snaps.log 2>&1"
+
+- name: lenskart snapshot
+  cron:
+    name: "lenskart snapshot"
+    minute: "20"
+    hour: "4"
+    job: "/root/script/es/snapshot_lenskart.sh >> /var/log/es-snaps.log 2>&1"
+    
+- name: entmed snapshot
+  cron:
+    name: "entmed snapshot"
+    minute: "30"
+    hour: "4"
+    job: "/root/script/es/snapshot_entmed.sh >> /var/log/es-snaps.log 2>&1"
+    
+- name: paytm snapshot
+  cron:
+    name: "paytm snapshot"
+    minute: "40"
+    hour: "4"
+    job: "/root/script/es/snapshot_paytm.sh >> /var/log/es-snaps.log 2>&1"
+    
+- name: tokopedia snapshot
+  cron:
+    name: "tokopedia snapshot"
+    minute: "50"
+    hour: "4"
+    job: "/root/script/es/snapshot_tokopedia.sh >> /var/log/es-snaps.log 2>&1"
+
+# End elasticSearch snapshots
+
+
+
+
+# Begin delete elasticSearch snapshots
+
+- name: delete default snapshot
+  cron:
+    name: "delete default snapshot"
+    minute: "10"
+    hour: "1"
+    job: "/root/script/es/delete_snapshot_default.sh >> /var/log/es-del-snaps.log 2>&1"
+
+- name: delete lenskart snapshot
+  cron:
+    name: "delete lenskart snapshot"
+    minute: "20"
+    hour: "1"
+    job: "/root/script/es/delete_snapshot_lenskart.sh >> /var/log/es-del-snaps.log 2>&1"
+    
+- name: delete entmed snapshot
+  cron:
+    name: "delete entmed snapshot"
+    minute: "30"
+    hour: "1"
+    job: "/root/script/es/delete_snapshot_entmed.sh >> /var/log/es-del-snaps.log 2>&1"
+    
+- name: delete paytm snapshot
+  cron:
+    name: "delete paytm snapshot"
+    minute: "40"
+    hour: "1"
+    job: "/root/script/es/delete_snapshot_paytm.sh >> /var/log/es-del-snaps.log 2>&1"
+    
+- name: delete tokopedia snapshot
+  cron:
+    name: "delete tokopedia snapshot"
+    minute: "50"
+    hour: "1"
+    job: "/root/script/es/delete_snapshot_tokopedia.sh >> /var/log/es-del-snaps.log 2>&1"
+
+# End delete elasticSearch snapshots

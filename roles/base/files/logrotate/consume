@@ -1,0 +1,13 @@
+/mnt/*.log {
+       size 1G
+       missingok
+       rotate 15
+       compress
+       delaycompress
+       notifempty
+       create 644 root root
+       sharedscripts
+       postrotate
+           invoke-rc.d rsyncd rotate >/dev/null 2>&1 || true
+       endscript
+}

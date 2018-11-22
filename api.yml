@@ -1,0 +1,32 @@
+---
+# For limited servers
+# ansible-playbook -vv api.yml --limit=api-1.betaout.org,api-2.betaout.org --vault-password-file=~/.vault_pass -f 10
+
+# For all servers
+# ansible-playbook -vv api.yml -f10 --vault-password-file=~/.vault_pass
+
+# debug variables
+# ansible-playbook -vv api.yml --tags=debugvars -f10 --vault-password-file=~/.vault_pass
+
+# host pattern need dev key
+# bg*:es*:misc-api*:m-api*:devprod*
+
+- hosts: api
+  gather_facts: True    
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson
+  roles:
+    - servertuning  
+    - base
+    - nginx
+    - phpfpm
+    - mongodbcommon
+    - mongo
+    - filebeat
+    - omd_agent
+    # In case of email api, logstash role is dynamically included from nginx.
+  
+
+  
+    

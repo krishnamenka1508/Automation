@@ -1,0 +1,10 @@
+---
+- name: install Redis
+  shell: pecl install redis
+  ignore_errors: yes
+  
+- name: redis | pecl | deploy configuration
+  template: src=redis.ini dest=/etc/php/7.0/mods-available/redis.ini owner=root mode=0644
+  
+- name: enable php module redis
+  shell: phpenmod redis

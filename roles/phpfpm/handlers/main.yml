@@ -1,0 +1,10 @@
+---
+# handlers file for phpfpm
+- name: php-fpm-start
+  service: name=php7.0-fpm start=started
+
+- name: php-fpm-restart
+  service: name=php7.0-fpm state=restarted
+
+- name: php-fpm-reload
+  service: name=php7.0-fpm state=reloaded

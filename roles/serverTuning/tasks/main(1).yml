@@ -1,0 +1,62 @@
+---
+# tasks file for serverTuning 
+# Force Locale
+- name: force locale
+  lineinfile: line='LC_ALL=en_US.UTF-8' dest=/etc/default/locale
+  tags:
+  - alls
+- name: locale gen
+  locale_gen: name=en_US.UTF-8 state=present
+  tags:
+  - alls
+- name: locale gen all
+  locale_gen: name={{ item }} state=present
+  with_items:
+      - en_US
+      - en_IN
+      - fr_FR
+      - de_DE
+      - de_CH
+      - be_BY
+  tags:
+  - alls
+  
+- name : install apt
+  apt: name=aptitude
+  tags:
+  - alls
+- name: Remove /etc/localtime 
+  file: path=/etc/localtime state=absent
+  register: localtime
+  tags:
+  - alls
+- name: setting defult time zone GMT
+  command: ln -sf /usr/share/zoneinfo/GMT /etc/localtime
+  when: localtime|success
+  tags:
+  - alls 
+ 
+- name: updates a server
+  apt: update_cache=yes
+  ignore_errors: yes
+  tags:
+  - alls
+  
+- name: upgrade a server
+  apt: upgrade=dist
+  ignore_errors: yes
+  tags:
+  - alls
+
+- name: Install monitoring tools
+  shell: apt -y install numactl sysstat htop glances iotop iftop xfsprogs
+  ignore_errors: yes
+  tags:
+  - alls
+
+
+  
+   
+
+  
+  

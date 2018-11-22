@@ -1,0 +1,30 @@
+---
+# Create mongoconfig  Primary Server
+- name: Create the file to initialize the mongod replica set
+  template: src=replset_init.j2 dest=/tmp/replset_init.js
+  when: primary == True
+
+
+- name: Pause for a while
+  pause: seconds=20
+  when: primary == True
+
+
+- name: Initialize the replication set
+  shell: /usr/bin/mongo --port "{{ port }}" /tmp/replset_init.js
+  when: primary == True
+
+#add Shards on mongos Server            
+- name: Create the file to add shard set
+  template: src=shard_init.j2 dest=/tmp/shard_init.j2
+  when: sharding == True
+
+
+- name: Pause for a while
+  pause: seconds=20
+  when: sharding == True
+
+
+- name: Add new shard
+  shell: /usr/bin/mongo  /tmp/shard_init.j2
+  when: sharding == True

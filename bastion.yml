@@ -1,0 +1,22 @@
+---
+# ansible-playbook bastion.yml --vault-password-file=~/.vault_pass
+
+# replacing nginx proxy and updating alias (disable "ForceCommand" in /etc/ssh/sshd_config on bastion server first)
+# ansible-playbook bastion.yml --tags=alias,proxy
+
+# install phpmyadmin manually and change mysql host accordingly in /etc/phpmyadmin/config-db.php.
+
+- hosts: bastion
+#  gather_facts: False
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson    
+  roles:
+    - servertuning  
+    - bastion
+    - phpfpm
+    - omd_agent
+    
+  
+  
+  
